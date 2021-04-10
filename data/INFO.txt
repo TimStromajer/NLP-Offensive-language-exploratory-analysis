@@ -1,0 +1,25 @@
+class:
+0 - none
+1 - offensive
+2 - abusive
+3 - cyberbullying
+4 - vulgar
+5 - racist
+6 - homophobic
+7 - profane
+8 - slur
+9 - harrasment
+10 - obscene
+11 - threat
+12 - discredit
+13 - hateful
+14 - insult
+15 - hostile
+
+16 - sexist
+17 - appearance-related
+18 - intellectual
+19 - political
+20 - religion
+
+files have two columns: class, text
