@@ -8,6 +8,7 @@ import json
 # tab = pd.read_csv("data/9_uo.csv")
 # tab2 = tab.replace({'class': {0: 13, 2: 0}})    # 1 -> 1
 # tab2 = tab2[["class", "tweet"]]
+# tab2 = tab2.rename(columns={'tweet': 'text'})
 # tab2.to_csv("data/9.csv")
 
 ##### 25
