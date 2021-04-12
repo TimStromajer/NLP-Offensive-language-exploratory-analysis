@@ -3,6 +3,7 @@ import sqlite3
 from sqlite3 import OperationalError
 from sqlalchemy import create_engine
 import json
+import os
 
 ##### 9
 # tab = pd.read_csv("data/9_uo.csv")
@@ -51,3 +52,29 @@ import json
 # df = pd.DataFrame(tabData, columns=['class', 'text'])
 # df.to_csv("data/21.csv")
 
+##### 32
+source_path = os.path.join("data", "32_uo", "Sharing Data")
+class_key = {
+    "appearance": 17,
+    "intelligence": 18,
+    "political": 19,
+    "racial": 5,
+    "sexual": 16
+}
+negative = [float('nan'), 'not sure', 'No', 'Other', 'NO', 'others', 'Not Sure', 'Not sure', 'N', 'Others', 'no', 'racism']
+positive = ['Yes', 'YES', 'yes ', 'yes']
+
+processed_frames = list()
+for file in os.scandir(source_path):
+    tab = pd.read_csv(file.path)
+    tweet_header = tab.columns[0]
+    decision_header = tab.columns[1]
+    harassment_class = class_key[file.name.lower().split()[0]]
+    tab = tab.replace({decision_header: dict.fromkeys(negative, 0) | dict.fromkeys(positive, harassment_class)})
+    tab = tab[[decision_header, tweet_header]]
+    tab = tab.rename(columns={tweet_header: 'text', decision_header: 'class'})
+    tab = tab[tab['text'].notna()]
+    processed_frames.append(tab)
+total = pd.concat(processed_frames)
+tab = tab[tab['text'].notna()]
+#total.to_csv(os.path.join("data", "32.csv"))
