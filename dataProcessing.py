@@ -61,8 +61,9 @@ class_key = {
     "racial": 5,
     "sexual": 16
 }
-negative = [float('nan'), 'not sure', 'No', 'Other', 'NO', 'others', 'Not Sure', 'Not sure', 'N', 'Others', 'no', 'racism']
+negative = [float('nan'), 'not sure', 'No', 'NO', 'Not Sure', 'Not sure', 'N', 'no']
 positive = ['Yes', 'YES', 'yes ', 'yes']
+other = ['Other', 'others', 'Others', 'racism']
 
 processed_frames = list()
 for file in os.scandir(source_path):
@@ -70,11 +71,21 @@ for file in os.scandir(source_path):
     tweet_header = tab.columns[0]
     decision_header = tab.columns[1]
     harassment_class = class_key[file.name.lower().split()[0]]
-    tab = tab.replace({decision_header: dict.fromkeys(negative, 0) | dict.fromkeys(positive, harassment_class)})
+    tab = tab.replace({decision_header: dict.fromkeys(negative, 0) |
+                                        dict.fromkeys(positive, harassment_class) |
+                                        dict.fromkeys(other, 21)})
     tab = tab[[decision_header, tweet_header]]
     tab = tab.rename(columns={tweet_header: 'text', decision_header: 'class'})
     tab = tab[tab['text'].notna()]
     processed_frames.append(tab)
-total = pd.concat(processed_frames)
-tab = tab[tab['text'].notna()]
-#total.to_csv(os.path.join("data", "32.csv"))
+total = pd.concat(processed_frames, ignore_index=True)
+# Multiple data-sets all just classify a single from of harassment
+# They mark 0 even if ti is harassment, but not of the type that dataset covers
+# In order to remove instances which were not tagged as harassment in one set but were in another
+# We find duplicates and remove all non-harassment instances, leaving only the instance from the right dataset
+duplicate_selector = total.duplicated(subset='text', keep=False)
+duplicates = total[duplicate_selector]
+neutral_duplicate_selector = duplicates['class'] == 0
+total = total[~(duplicate_selector & neutral_duplicate_selector)]
+total.to_csv(os.path.join("data", "32.csv"))
+# Will likely have to filter out all 0 as well, because many of them are clearly offensive
