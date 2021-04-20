@@ -22,4 +22,6 @@ class:
 19 - political
 20 - religion
 
+21 - unclassified offensive
+
 files have two columns: class, text
