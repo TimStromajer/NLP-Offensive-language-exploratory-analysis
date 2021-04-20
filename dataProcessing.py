@@ -104,22 +104,33 @@ def extract_message(post):
         if type(element) is NavigableString:
             text = " ".join((str(element)).split())
             text = re.sub(r'(^|[^\s]+):n|(\b)n(\b\s*)', '', text)
-            if len(text.split()) > 2:
+            if len(text) > 3 and len(text) != 16 and text != "Quote: ":
                 useful_text.append(text)
         else:
             for child in element.children:
                 traverse(child)
     traverse(soup)
-    if useful_text:
-        return max(useful_text, key=lambda x: len(x))
-    return ""
+
+    return useful_text
 
 
 source_path = os.path.join("data", "31_uo", "31_uo.csv")
 bully_posts = pd.read_csv(source_path, header=None, nrows=632, usecols=[0, 1], names=['topic', 'post'])
-posts = pd.read_csv(source_path, header=None, skiprows=632, usecols=[3], names=['text'])
-posts['text'] = posts['text'].apply(extract_message)
+bully_posts['full_id'] = bully_posts['topic'].combine(bully_posts['post'], lambda a, b: f"{a}:{b}")
 
-print(bully_posts)
-print(posts)
-print(posts['text'][4])
+posts = pd.read_csv(source_path, header=None, skiprows=632, usecols=[0, 1, 3], names=['topic', 'post', 'text'])
+posts['full_id'] = posts['topic'].combine(posts['post'], lambda a, b: f"{a}:{b}")
+
+keep_negative = False
+if keep_negative:
+    posts['class'] = 0
+    posts.loc[posts['full_id'].isin(bully_posts['full_id']), 'class'] = 3
+else:
+    posts['class'] = 3
+    posts = posts[posts['full_id'].isin(bully_posts['full_id'])]
+
+posts['text'] = posts['text'].apply(extract_message)
+posts['text'] = posts['text'].apply(", ".join)
+posts = posts[['class', 'text']]
+
+posts.to_csv(os.path.join("data", "31.csv"))
