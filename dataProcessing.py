@@ -4,6 +4,7 @@ from sqlite3 import OperationalError
 from sqlalchemy import create_engine
 from bs4 import BeautifulSoup, NavigableString, Tag
 import json
+import tweepy as tw
 import os
 import re
 
@@ -53,6 +54,57 @@ import re
 #
 # df = pd.DataFrame(tabData, columns=['class', 'text'])
 # df.to_csv("data/21.csv")
+
+
+##### 26 - getting 900 tweets / 15 min = 3600 / hour; last: 848187434735194112
+# consumer_key= 'IQ82FYxYl0ujW6ulJROH2GGhk'
+# consumer_secret= '5PYcvLKayHKU7QQGtQOW3Rhchf0dT7km5dBMJsRb3CrgPjEKvf'
+#
+# auth = tw.AppAuthHandler(consumer_key, consumer_secret)
+# api = tw.API(auth, wait_on_rate_limit=True)
+#
+# tabData = {'class':  [], 'text': []}
+# tweetCounter = 0
+# tab = pd.read_csv("data/26_uo.tab", sep='\t')
+# start = False
+# for row in tab.iterrows():
+#     cls = row[1]["maj_label"]
+#     if cls == "abusive":
+#
+#         idt = int(row[1]["tweet_id"])
+#         print(idt)
+#
+#         if idt == 848187434735194112:
+#             start = True
+#         if not start:
+#             continue
+#
+#         tweetCounter += 1
+#         try:
+#             twit = api.get_status(idt, tweet_mode="extended")
+#             print("tweet obtained")
+#             if len(twit.full_text) > 0:
+#                 tabData["class"].append(2)
+#                 tabData["text"].append(twit.full_text)
+#         except:
+#             print("tweet does not exist")
+#
+#         if tweetCounter > 10000:
+#             break
+#
+#
+# df = pd.DataFrame(tabData, columns=['class', 'text'])
+# df.to_csv("data/26.csv")
+## combine two tables
+# tab1 = pd.read_csv("data/26_old.csv")
+# tab2 = pd.read_csv("data/26_2.csv")
+# for row in tab2.iterrows():
+#     tab1.append({"class": row[1]["class"], "text": row[1]["text"]}, ignore_index=True)
+#     # tab1["class"].append(row[1]["class"])
+#     # tab1["text"].append(row[1]["text"])
+# tab1 = tab1[["class", "text"]]
+# tab1.to_csv("data/26_combined.csv")
+
 
 ##### 32
 # source_path = os.path.join("data", "32_uo", "Sharing Data")
