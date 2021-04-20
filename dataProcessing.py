@@ -143,46 +143,44 @@ import re
 # total = total[~(duplicate_selector & neutral_duplicate_selector)]
 # not_negative = total[total['class'] != 0]
 # not_negative.to_csv(os.path.join("data", "32.csv"))
-# # Will likely have to filter out all 0 as well, because many of them are clearly offensive
+
 
 ##### 31
-
-
-def extract_message(post):
-    soup = BeautifulSoup(post, features="lxml")
-    useful_text = list()
-
-    def traverse(element):
-        if type(element) is NavigableString:
-            text = " ".join((str(element)).split())
-            text = re.sub(r'(^|[^\s]+):n|(\b)n(\b\s*)', '', text)
-            if len(text) > 3 and len(text) != 16 and text != "Quote: ":
-                useful_text.append(text)
-        else:
-            for child in element.children:
-                traverse(child)
-    traverse(soup)
-
-    return useful_text
-
-
-source_path = os.path.join("data", "31_uo", "31_uo.csv")
-bully_posts = pd.read_csv(source_path, header=None, nrows=632, usecols=[0, 1], names=['topic', 'post'])
-bully_posts['full_id'] = bully_posts['topic'].combine(bully_posts['post'], lambda a, b: f"{a}:{b}")
-
-posts = pd.read_csv(source_path, header=None, skiprows=632, usecols=[0, 1, 3], names=['topic', 'post', 'text'])
-posts['full_id'] = posts['topic'].combine(posts['post'], lambda a, b: f"{a}:{b}")
-
-keep_negative = False
-if keep_negative:
-    posts['class'] = 0
-    posts.loc[posts['full_id'].isin(bully_posts['full_id']), 'class'] = 3
-else:
-    posts['class'] = 3
-    posts = posts[posts['full_id'].isin(bully_posts['full_id'])]
-
-posts['text'] = posts['text'].apply(extract_message)
-posts['text'] = posts['text'].apply(", ".join)
-posts = posts[['class', 'text']]
-
-posts.to_csv(os.path.join("data", "31.csv"))
+# def extract_message(post):
+#     soup = BeautifulSoup(post, features="lxml")
+#     useful_text = list()
+#
+#     def traverse(element):
+#         if type(element) is NavigableString:
+#             text = " ".join((str(element)).split())
+#             text = re.sub(r'(^|[^\s]+):n|(\b)n(\b\s*)', '', text)
+#             if len(text) > 3 and len(text) != 16 and text != "Quote: ":
+#                 useful_text.append(text)
+#         else:
+#             for child in element.children:
+#                 traverse(child)
+#     traverse(soup)
+#
+#     return useful_text
+#
+#
+# source_path = os.path.join("data", "31_uo", "31_uo.csv")
+# bully_posts = pd.read_csv(source_path, header=None, nrows=632, usecols=[0, 1], names=['topic', 'post'])
+# bully_posts['full_id'] = bully_posts['topic'].combine(bully_posts['post'], lambda a, b: f"{a}:{b}")
+#
+# posts = pd.read_csv(source_path, header=None, skiprows=632, usecols=[0, 1, 3], names=['topic', 'post', 'text'])
+# posts['full_id'] = posts['topic'].combine(posts['post'], lambda a, b: f"{a}:{b}")
+#
+# keep_negative = False
+# if keep_negative:
+#     posts['class'] = 0
+#     posts.loc[posts['full_id'].isin(bully_posts['full_id']), 'class'] = 3
+# else:
+#     posts['class'] = 3
+#     posts = posts[posts['full_id'].isin(bully_posts['full_id'])]
+#
+# posts['text'] = posts['text'].apply(extract_message)
+# posts['text'] = posts['text'].apply(", ".join)
+# posts = posts[['class', 'text']]
+#
+# posts.to_csv(os.path.join("data", "31.csv"))
