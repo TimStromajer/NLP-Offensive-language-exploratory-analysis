@@ -4,6 +4,7 @@ from sqlite3 import OperationalError
 from sqlalchemy import create_engine
 import json
 import tweepy as tw
+import os
 
 ##### 9
 # tab = pd.read_csv("data/9_uo.csv")
@@ -51,6 +52,7 @@ import tweepy as tw
 #
 # df = pd.DataFrame(tabData, columns=['class', 'text'])
 # df.to_csv("data/21.csv")
+
 
 ##### 26 - getting 900 tweets / 15 min = 3600 / hour; last: 848187434735194112
 # consumer_key= 'IQ82FYxYl0ujW6ulJROH2GGhk'
@@ -101,3 +103,41 @@ import tweepy as tw
 # tab1 = tab1[["class", "text"]]
 # tab1.to_csv("data/26_combined.csv")
 
+
+##### 32
+source_path = os.path.join("data", "32_uo", "Sharing Data")
+class_key = {
+    "appearance": 17,
+    "intelligence": 18,
+    "political": 19,
+    "racial": 5,
+    "sexual": 16
+}
+negative = [float('nan'), 'not sure', 'No', 'NO', 'Not Sure', 'Not sure', 'N', 'no']
+positive = ['Yes', 'YES', 'yes ', 'yes']
+other = ['Other', 'others', 'Others', 'racism']
+
+processed_frames = list()
+for file in os.scandir(source_path):
+    tab = pd.read_csv(file.path)
+    tweet_header = tab.columns[0]
+    decision_header = tab.columns[1]
+    harassment_class = class_key[file.name.lower().split()[0]]
+    tab = tab.replace({decision_header: dict.fromkeys(negative, 0) |
+                                        dict.fromkeys(positive, harassment_class) |
+                                        dict.fromkeys(other, 21)})
+    tab = tab[[decision_header, tweet_header]]
+    tab = tab.rename(columns={tweet_header: 'text', decision_header: 'class'})
+    tab = tab[tab['text'].notna()]
+    processed_frames.append(tab)
+total = pd.concat(processed_frames, ignore_index=True)
+# Multiple data-sets all just classify a single from of harassment
+# They mark 0 even if ti is harassment, but not of the type that dataset covers
+# In order to remove instances which were not tagged as harassment in one set but were in another
+# We find duplicates and remove all non-harassment instances, leaving only the instance from the right dataset
+duplicate_selector = total.duplicated(subset='text', keep=False)
+duplicates = total[duplicate_selector]
+neutral_duplicate_selector = duplicates['class'] == 0
+total = total[~(duplicate_selector & neutral_duplicate_selector)]
+total.to_csv(os.path.join("data", "32.csv"))
+# Will likely have to filter out all 0 as well, because many of them are clearly offensive
