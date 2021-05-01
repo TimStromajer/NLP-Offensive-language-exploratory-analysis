@@ -2,10 +2,11 @@ import re
 
 import nltk
 import pandas as pd
-from nltk.stem import SnowballStemmer
+from nltk.stem import SnowballStemmer, PorterStemmer
 import string
 
 stemmer = SnowballStemmer("english")
+porter = PorterStemmer()
 
 
 def tokenize(raw):
@@ -53,7 +54,7 @@ def tokenize_and_stem_map_terms(text, stem_term_map):
 
     stems = list()
     for t in filtered_tokens:
-        stem = stemmer.stem(t)
+        stem = porter.stem(t)
         stems.append(stem)
         if stem not in stem_term_map:
             stem_term_map[stem] = dict()
