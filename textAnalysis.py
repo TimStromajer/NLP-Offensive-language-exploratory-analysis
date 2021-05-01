@@ -1,3 +1,4 @@
+import os
 import pickle
 
 import pandas as pd
@@ -8,7 +9,7 @@ from sklearn.cluster import KMeans
 from sklearn.decomposition import PCA
 from nltk.corpus import stopwords
 
-from textProcessing import tokenize_and_stem, vocabulary_frame
+from textProcessing import tokenize_and_stem, vocabulary_frame, tokenize_and_stem_map_terms
 from speech_classes import SPEECH_CLASSES
 
 
@@ -17,6 +18,8 @@ def combine_texts(tabs):
     num_classes = len(SPEECH_CLASSES)
 
     def read_table(table):
+        if not os.path.exists("data_pickles"):
+            os.makedirs("data_pickles")
         filename = f"data_pickles/{table}.p"
         try:
             with open(filename, "rb") as f:
@@ -56,28 +59,37 @@ def combine_texts(tabs):
 
 
 def tf_idf(texts):
+    if not os.path.exists("model_pickles"):
+        os.makedirs("model_pickles")
     filename_vectorizer = f"model_pickles/tfidf_vectorizer.p"
     filename_tfidf = f"model_pickles/tfidf_vector.p"
+    filename_stem_term_map = f"model_pickles/stem_term_map.p"
     try:
         vect = joblib.load(filename_vectorizer)
         tfidf = joblib.load(filename_tfidf)
+        stem_term_map = joblib.load(filename_stem_term_map)
         print(f"Loaded TfIdf vector from disk")
-        return tfidf, vect.get_feature_names()
     except FileNotFoundError:
+        stem_term_map = dict()
+        tokenizer_function = lambda t: tokenize_and_stem_map_terms(t, stem_term_map)
         vect = TfidfVectorizer(
             max_features=200000,
             stop_words=set(stopwords.words("english")),
             max_df=0.5,
             min_df=5,
             use_idf=True,
-            tokenizer=tokenize_and_stem,
+            tokenizer=tokenizer_function,
             ngram_range=(1, 3)
         )
         print(f"Performing TfIdf...")
         tfidf = vect.fit_transform(texts)
+        # remove function to prevent crash, can't pickle lambdas
+        vect.tokenizer = None
         joblib.dump(vect, filename_vectorizer)
         joblib.dump(tfidf, filename_tfidf)
-        return tfidf, vect.get_feature_names()
+        joblib.dump(stem_term_map, filename_stem_term_map)
+    finally:
+        return tfidf, vect.get_feature_names(), stem_term_map
 
 
 def cosine_distance(tfidf):
@@ -102,7 +114,7 @@ if __name__ == '__main__':
     k = 5
     tables = [f"{i}.csv" for i in [9, 25, 26, 31, 32]]
     documents, classes = combine_texts(tables)
-    tfidf, terms = tf_idf(documents)
+    tfidf, terms, stem_term_map = tf_idf(documents)
     dense = tfidf.todense()
     denselist = dense.tolist()
 
@@ -124,7 +136,8 @@ if __name__ == '__main__':
         for i in range(k):
             f.write(f"Cluster {i}\n")
             for ind in order_centroids[i, :10]:
-                f.write(f"\t{terms[ind]}\n")
+                output_term = [stem_term_map[term] for term in terms[ind].split()]
+                f.write(f"\t{output_term}\n")
             f.write("\n\n")
 
     kmean_indices = km.fit_predict(tfidf)
