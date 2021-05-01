@@ -28,6 +28,8 @@ def tokenize_and_stem(text):
     filtered_tokens = []
     # Filter out any tokens not containing letters (e.g., numeric tokens, raw punctuation).
     for token in tokens:
+        if token == "https" or token == "http":
+            continue
         if re.search('[a-zA-Z]', token):
             filtered_tokens.append(token)
     stems = [stemmer.stem(t) for t in filtered_tokens]
