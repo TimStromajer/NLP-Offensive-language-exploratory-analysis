@@ -141,7 +141,7 @@ if __name__ == '__main__':
     fig, ax = plt.subplots()
     ax.scatter(x_axis, y_axis, c=[colors[d] for d in kmean_indices])
     for i in range(len(classes)):
-        ax.annotate(SPEECH_CLASSES[i], (x_axis[i], y_axis[i]))
+        ax.annotate(SPEECH_CLASSES[classes[i]], (x_axis[i], y_axis[i]))
 
     plt.show()
 
