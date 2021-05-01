@@ -38,13 +38,21 @@ def combine_texts(tabs):
             pickle.dump(speech_classes, f)
         return speech_classes
 
-    speech_classes = ["" for _ in range(num_classes)]
+    speech_class_documents = ["" for _ in range(num_classes)]
+    non_empty_classes = list(range(len(SPEECH_CLASSES)))
+    non_empty_documents = []
     for t in tabs:
         speech_classes_t = read_table(t)
-        for i in range(len(speech_classes)):
-            speech_classes[i] += speech_classes_t[i]
+        for i in range(len(speech_class_documents)):
+            speech_class_documents[i] += speech_classes_t[i]
 
-    return speech_classes
+    for i in range(len(speech_class_documents)):
+        if len(speech_class_documents[i]) == 0:
+            non_empty_classes.remove(i)
+        else:
+            non_empty_documents.append(speech_class_documents[i])
+
+    return non_empty_documents, non_empty_classes
 
 
 def tf_idf(texts):
@@ -93,8 +101,8 @@ def k_means(matrix, k):
 if __name__ == '__main__':
     k = 5
     tables = [f"{i}.csv" for i in [9, 25, 26, 31, 32]]
-    ofsCls = combine_texts(tables)
-    tfidf, terms = tf_idf(ofsCls)
+    documents, classes = combine_texts(tables)
+    tfidf, terms = tf_idf(documents)
     dense = tfidf.todense()
     denselist = dense.tolist()
 
@@ -132,7 +140,7 @@ if __name__ == '__main__':
 
     fig, ax = plt.subplots()
     ax.scatter(x_axis, y_axis, c=[colors[d] for d in kmean_indices])
-    for i in range(len(SPEECH_CLASSES)):
+    for i in range(len(classes)):
         ax.annotate(SPEECH_CLASSES[i], (x_axis[i], y_axis[i]))
 
     plt.show()
