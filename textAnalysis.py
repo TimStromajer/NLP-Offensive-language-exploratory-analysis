@@ -67,7 +67,7 @@ def tf_idf(texts):
         vect = TfidfVectorizer(
             max_features=200000,
             stop_words=set(stopwords.words("english")),
-            max_df=0.8,
+            max_df=0.5,
             min_df=5,
             use_idf=True,
             tokenizer=tokenize_and_stem,
