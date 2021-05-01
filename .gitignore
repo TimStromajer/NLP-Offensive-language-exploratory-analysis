@@ -1,3 +1,7 @@
+#Pickled data
+data_pickles/
+model_pickles/
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
