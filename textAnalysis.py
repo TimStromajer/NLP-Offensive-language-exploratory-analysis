@@ -104,15 +104,15 @@ def k_means(matrix, k):
         return km
     except FileNotFoundError:
         print(f"Performing K-Means clustering with k={k}...")
-        km = KMeans(n_clusters=k, init="k-means++", max_iter=100, n_init=1)
+        km = KMeans(n_clusters=k, init="k-means++", max_iter=10000, n_init=1000)
         km.fit(matrix)
         joblib.dump(km, filename)
         return km
 
 
 if __name__ == '__main__':
-    k = 5
-    tables = [f"{i}.csv" for i in [9, 25, 26, 31, 32]]
+    k = 6
+    tables = [f"{i}.csv" for i in [9, 21, 25, 26, 31, 32]]
     documents, classes = combine_texts(tables)
     tfidf, terms, stem_term_map = tf_idf(documents)
     dense = tfidf.todense()
@@ -129,18 +129,26 @@ if __name__ == '__main__':
         all_keywords.append(keywords)
 
     km = k_means(tfidf, k)
-    labels = [SPEECH_CLASSES[i] for i in km.labels_]
+    kmean_indices = km.fit_predict(tfidf)
     order_centroids = km.cluster_centers_.argsort()[:, ::-1]
+
+    # Creates dict mapping cluster to text classes
+    # kmean_indices: index = text class; value = cluster
+    cluster_classes = dict()
+    for text_class, cluster in enumerate(kmean_indices):
+        if cluster not in cluster_classes:
+            cluster_classes[cluster] = list()
+        cluster_classes[cluster].append(SPEECH_CLASSES[classes[text_class]])
 
     with open("clusters.txt", "w") as f:
         for i in range(k):
-            f.write(f"Cluster {i}\n")
+            f.write(f"Cluster {i}: {cluster_classes[i]}\n")
             for ind in order_centroids[i, :10]:
                 output_term = [stem_term_map[term] for term in terms[ind].split()]
+                output_term = [max(term, key=term.get) for term in output_term]
                 f.write(f"\t{output_term}\n")
             f.write("\n\n")
 
-    kmean_indices = km.fit_predict(tfidf)
     pca = PCA(n_components=2)
     scatter_plot_points = pca.fit_transform(tfidf.toarray())
     colors = ["r", "g", "b", "c", "y", "m"]
