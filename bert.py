@@ -7,26 +7,40 @@ import matplotlib.pyplot as plt
 from scipy.cluster.hierarchy import dendrogram, linkage
 import numpy as np
 
-from bert_vectors import mean, sent
+from bert_vectors import mean, sent, mean2
 from speech_classes import SPEECH_CLASSES
 
 
 def bert_to_vec(text, model, tokenizer):
-    # text = "Here is the sentence I want embeddings for."
-    marked_text = "[CLS] " + text + " [SEP]"
+    # # text = "Here is the sentence I want embeddings for."
+    # marked_text = "[CLS] " + text + " [SEP]"
+    #
+    # # Tokenize our sentence with the BERT tokenizer.
+    # tokenized_text = tokenizer.tokenize(marked_text)
+    #
+    # # Map the token strings to their vocabulary indeces.
+    # indexed_tokens = tokenizer.convert_tokens_to_ids(tokenized_text)
+    #
+    # # Mark each of the 22 tokens as belonging to sentence "1".
+    # segments_ids = [1] * len(tokenized_text)
+    #
+    # # Convert inputs to PyTorch tensors
+    # tokens_tensor = torch.tensor([indexed_tokens])
+    # segments_tensors = torch.tensor([segments_ids])
 
-    # Tokenize our sentence with the BERT tokenizer.
-    tokenized_text = tokenizer.tokenize(marked_text)
+    # Encode the sentence
+    encoded = tokenizer.encode_plus(
+        text=text,  # the sentence to be encoded
+        add_special_tokens=True,  # Add [CLS] and [SEP]
+        #max_length=64,  # maximum length of a sentence
+        padding=True,  # Add [PAD]s
+        return_attention_mask=True,  # Generate the attention mask
+        return_tensors='pt',  # ask the function to return PyTorch tensors
+    )
 
-    # Map the token strings to their vocabulary indeces.
-    indexed_tokens = tokenizer.convert_tokens_to_ids(tokenized_text)
-
-    # Mark each of the 22 tokens as belonging to sentence "1".
-    segments_ids = [1] * len(tokenized_text)
-
-    # Convert inputs to PyTorch tensors
-    tokens_tensor = torch.tensor([indexed_tokens])
-    segments_tensors = torch.tensor([segments_ids])
+    # Get the input IDs and attention mask in tensor format
+    tokens_tensor = encoded['input_ids']
+    segments_tensors = encoded['attention_mask']
 
     # Run the text through BERT, and collect all of the hidden states produced
     # from all 12 layers.
@@ -125,10 +139,13 @@ def get_texts(tables, chosen_class, max_len=100000):
             id = row[1]["class"]
             text = row[1]["text"]
             if id == chosen_class:
-                if len(text) > 512:
-                    texts.append(text[:512])
+                if len(text) > 480: #max is 512
+                    texts.append((text[:480] + str(". This is " + SPEECH_CLASSES[chosen_class] + ".")))
                 else:
-                    texts.append(text)
+                    if text[-1] != ".":
+                        texts.append((text + str(". This is " + SPEECH_CLASSES[chosen_class] + ".")))
+                    else:
+                        texts.append((text + str(" This is " + SPEECH_CLASSES[chosen_class] + ".")))
             if len(texts) >= max_len:
                 break
     print("number of texts:", len(texts))
@@ -175,14 +192,18 @@ def visualize_dendrogram():
 
 if __name__ == '__main__':
     # mean and sentences saved in bert_vectors.py
-    tables = ["32.csv"]
-    chosen_class = 18
-    model, tokenizer = load_model_and_tokenizer()
-    texts = get_texts(tables, chosen_class)
-    class_mean, sentence = get_mean_and_sentence(model, tokenizer, texts)
-    print(sentence)
+    # tables = ["21.csv", "9.csv"]
+    # chosen_class = 20
+    # model, tokenizer = load_model_and_tokenizer()
+    # texts = get_texts(tables, chosen_class)
+    # class_mean, sentence = get_mean_and_sentence(model, tokenizer, texts)
+    # print(sentence)
+    # print(class_mean)
 
-    visualize_dendrogram()
+    # visualize_dendrogram()
+
+    # for c, s in zip(SPEECH_CLASSES, sent):
+    #     print(c, s)
 
 
 
