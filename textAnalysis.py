@@ -142,11 +142,11 @@ if __name__ == '__main__':
 
     with open("clusters.txt", "w") as f:
         for i in range(k):
-            f.write(f"Cluster {i}: {cluster_classes[i]}\n")
+            f.write(f"Cluster {i}: {', '.join(cluster_classes[i])}\n")
             for ind in order_centroids[i, :10]:
                 output_term = [stem_term_map[term] for term in terms[ind].split()]
                 output_term = [max(term, key=term.get) for term in output_term]
-                f.write(f"\t{output_term}\n")
+                f.write(f"\t{' '.join(output_term)}\n")
             f.write("\n\n")
 
     pca = PCA(n_components=2)
