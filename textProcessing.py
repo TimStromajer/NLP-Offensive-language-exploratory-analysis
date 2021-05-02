@@ -2,10 +2,11 @@ import re
 
 import nltk
 import pandas as pd
-from nltk.stem import SnowballStemmer
+from nltk.stem import SnowballStemmer, PorterStemmer
 import string
 
 stemmer = SnowballStemmer("english")
+porter = PorterStemmer()
 
 
 def tokenize(raw):
@@ -23,6 +24,9 @@ def stemming(tokens):
 
 
 def tokenize_and_stem(text):
+    # Remove links
+    url_link_regex = r'https?:\/\/[^\s]*'
+    text = re.sub(url_link_regex, '', text)
     # First tokenize by sentence, then by word to ensure that punctuation is caught as it's own token.
     tokens = [word for sent in nltk.sent_tokenize(text) for word in nltk.word_tokenize(sent)]
     filtered_tokens = []
@@ -31,6 +35,30 @@ def tokenize_and_stem(text):
         if re.search('[a-zA-Z]', token):
             filtered_tokens.append(token)
     stems = [stemmer.stem(t) for t in filtered_tokens]
+    return stems
+
+
+# same as above, but saves a mapping from stems to dictionaries of original terms and their counts
+# used for retrieving original terms
+def tokenize_and_stem_map_terms(text, stem_term_map):
+    # Remove links
+    url_link_regex = r'https?:\/\/[^\s]*'
+    text = re.sub(url_link_regex, '', text)
+    # First tokenize by sentence, then by word to ensure that punctuation is caught as it's own token.
+    tokens = [word for sent in nltk.sent_tokenize(text) for word in nltk.word_tokenize(sent)]
+    filtered_tokens = []
+    # Filter out any tokens not containing letters (e.g., numeric tokens, raw punctuation).
+    for token in tokens:
+        if re.search('[a-zA-Z]', token):
+            filtered_tokens.append(token)
+
+    stems = list()
+    for t in filtered_tokens:
+        stem = porter.stem(t)
+        stems.append(stem)
+        if stem not in stem_term_map:
+            stem_term_map[stem] = dict()
+        stem_term_map[stem][t] = stem_term_map[stem].get(t, 0) + 1
     return stems
 
 
