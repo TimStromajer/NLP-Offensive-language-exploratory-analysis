@@ -1,3 +1,4 @@
+import os
 import pickle
 
 import pandas as pd
@@ -5,9 +6,10 @@ import joblib
 import matplotlib.pyplot as plt
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.cluster import KMeans
-from sklearn.manifold import MDS
+from sklearn.decomposition import PCA
+from nltk.corpus import stopwords
 
-from textProcessing import tokenize_and_stem, vocabulary_frame
+from textProcessing import tokenize_and_stem, vocabulary_frame, tokenize_and_stem_map_terms
 from speech_classes import SPEECH_CLASSES
 
 
@@ -16,6 +18,8 @@ def combine_texts(tabs):
     num_classes = len(SPEECH_CLASSES)
 
     def read_table(table):
+        if not os.path.exists("data_pickles"):
+            os.makedirs("data_pickles")
         filename = f"data_pickles/{table}.p"
         try:
             with open(filename, "rb") as f:
@@ -37,26 +41,55 @@ def combine_texts(tabs):
             pickle.dump(speech_classes, f)
         return speech_classes
 
-    speech_classes = ["" for _ in range(num_classes)]
+    speech_class_documents = ["" for _ in range(num_classes)]
+    non_empty_classes = list(range(len(SPEECH_CLASSES)))
+    non_empty_documents = []
     for t in tabs:
         speech_classes_t = read_table(t)
-        for i in range(len(speech_classes)):
-            speech_classes[i] += speech_classes_t[i]
+        for i in range(len(speech_class_documents)):
+            speech_class_documents[i] += speech_classes_t[i]
 
-    return speech_classes
+    for i in range(len(speech_class_documents)):
+        if len(speech_class_documents[i]) == 0:
+            non_empty_classes.remove(i)
+        else:
+            non_empty_documents.append(speech_class_documents[i])
+
+    return non_empty_documents, non_empty_classes
 
 
 def tf_idf(texts):
-    print("calculating Tf-Idf ...")
-    vect = TfidfVectorizer(
-        max_features=200000,
-        stop_words='english',
-        use_idf=True,
-        tokenizer=tokenize_and_stem,
-        ngram_range=(1, 3)
-    )
-
-    return vect.fit_transform(texts), vect.get_feature_names()
+    if not os.path.exists("model_pickles"):
+        os.makedirs("model_pickles")
+    filename_vectorizer = f"model_pickles/tfidf_vectorizer.p"
+    filename_tfidf = f"model_pickles/tfidf_vector.p"
+    filename_stem_term_map = f"model_pickles/stem_term_map.p"
+    try:
+        vect = joblib.load(filename_vectorizer)
+        tfidf = joblib.load(filename_tfidf)
+        stem_term_map = joblib.load(filename_stem_term_map)
+        print(f"Loaded TfIdf vector from disk")
+    except FileNotFoundError:
+        stem_term_map = dict()
+        tokenizer_function = lambda t: tokenize_and_stem_map_terms(t, stem_term_map)
+        vect = TfidfVectorizer(
+            max_features=200000,
+            stop_words=set(stopwords.words("english")),
+            max_df=0.5,
+            min_df=5,
+            use_idf=True,
+            tokenizer=tokenizer_function,
+            ngram_range=(1, 3)
+        )
+        print(f"Performing TfIdf...")
+        tfidf = vect.fit_transform(texts)
+        # remove function to prevent crash, can't pickle lambdas
+        vect.tokenizer = None
+        joblib.dump(vect, filename_vectorizer)
+        joblib.dump(tfidf, filename_tfidf)
+        joblib.dump(stem_term_map, filename_stem_term_map)
+    finally:
+        return tfidf, vect.get_feature_names(), stem_term_map
 
 
 def cosine_distance(tfidf):
@@ -71,80 +104,68 @@ def k_means(matrix, k):
         return km
     except FileNotFoundError:
         print(f"Performing K-Means clustering with k={k}...")
-        km = KMeans(n_clusters=k)
+        km = KMeans(n_clusters=k, init="k-means++", max_iter=10000, n_init=1000)
         km.fit(matrix)
         joblib.dump(km, filename)
         return km
 
 
-def getClusterWords(km, vocab_frame, cluster, n=6):
+if __name__ == '__main__':
+    k = 6
+    tables = [f"{i}.csv" for i in [9, 21, 25, 26, 31, 32]]
+    documents, classes = combine_texts(tables)
+    tfidf, terms, stem_term_map = tf_idf(documents)
+    dense = tfidf.todense()
+    denselist = dense.tolist()
+
+    all_keywords = []
+    for description in denselist:
+        x = 0
+        keywords = []
+        for word in description:
+            if word > 0:
+                keywords.append(terms[x])
+            x += 1
+        all_keywords.append(keywords)
+
+    km = k_means(tfidf, k)
+    kmean_indices = km.fit_predict(tfidf)
     order_centroids = km.cluster_centers_.argsort()[:, ::-1]
-    words = []
-    for ind in order_centroids[cluster, :n]:
-        words.append(vocab_frame.loc[terms[ind].split(' '), ].values.tolist()[0][0])
-    return ", ".join(words)
 
+    # Creates dict mapping cluster to text classes
+    # kmean_indices: index = text class; value = cluster
+    cluster_classes = dict()
+    for text_class, cluster in enumerate(kmean_indices):
+        if cluster not in cluster_classes:
+            cluster_classes[cluster] = list()
+        cluster_classes[cluster].append(SPEECH_CLASSES[classes[text_class]])
 
-def visualise_mds(tfidf, km, vocab_frame):
-    clusters = km.labels_.tolist()
-    dist = cosine_distance(tfidf)
-    mds = MDS(n_components=2, dissimilarity="precomputed", random_state=1)
+    with open("clusters.txt", "w") as f:
+        for i in range(k):
+            f.write(f"Cluster {i}: {cluster_classes[i]}\n")
+            for ind in order_centroids[i, :10]:
+                output_term = [stem_term_map[term] for term in terms[ind].split()]
+                output_term = [max(term, key=term.get) for term in output_term]
+                f.write(f"\t{output_term}\n")
+            f.write("\n\n")
 
-    # Shape of the result will be (n_components, n_samples).
-    pos = mds.fit_transform(dist)
+    pca = PCA(n_components=2)
+    scatter_plot_points = pca.fit_transform(tfidf.toarray())
+    colors = ["r", "g", "b", "c", "y", "m"]
 
-    xs, ys = pos[:, 0], pos[:, 1]
-    cluster_colors = {0: '#1b9e77', 1: '#d95f02', 2: '#7570b3', 3: '#e7298a', 4: '#66a61e'}
+    x_axis = []
+    y_axis = []
+    for x, y in scatter_plot_points:
+        x_axis.append(x)
+        y_axis.append(y)
 
-    # Define cluster names
-    cluster_names = dict([(i, getClusterWords(km, vocab_frame, i, 3)) for i in range(5)])
-
-    df = pd.DataFrame(dict(x=xs, y=ys, label=clusters, title=SPEECH_CLASSES))
-
-    # Group by cluster.
-    groups = df.groupby('label')
-
-    # Set up plot.
-    fig, ax = plt.subplots(figsize=(17, 9))  # set size
-    ax.margins(0.05)  # Optional, just adds 5% padding to the autoscaling
-
-    # Iterate through groups to layer the plot.
-    # Note that we use the cluster_name and cluster_color dicts with the 'name'
-    # lookup to return the appropriate color/label.
-    for name, group in groups:
-        ax.plot(group.x, group.y, marker='o', linestyle='', ms=12,
-                label=cluster_names[name], color=cluster_colors[name],
-                mec='none')
-        ax.set_aspect('auto')
-        ax.tick_params(
-            axis='x',  # changes apply to the x-axis
-            which='both',  # both major and minor ticks are affected
-            bottom='off',  # ticks along the bottom edge are off
-            top='off',  # ticks along the top edge are off
-            labelbottom='off')
-        ax.tick_params(
-            axis='y',  # changes apply to the y-axis
-            which='both',  # both major and minor ticks are affected
-            left='off',  # ticks along the bottom edge are off
-            top='off',  # ticks along the top edge are off
-            labelleft='off')
-
-    ax.legend(numpoints=1)  # show legend with only 1 point
-
-    # Add label in x,y position with the label as the film title.
-    for i in range(len(df)):
-        ax.text(df.loc[df.index[i], 'x'], df.loc[df.index[i], 'y'], df.loc[df.index[i], 'title'], size=8)
+    fig, ax = plt.subplots()
+    ax.scatter(x_axis, y_axis, c=[colors[d] for d in kmean_indices])
+    for i in range(len(classes)):
+        ax.annotate(SPEECH_CLASSES[classes[i]], (x_axis[i], y_axis[i]))
 
     plt.show()
 
+    print("")
 
-if __name__ == '__main__':
-    tables = [f"{i}.csv" for i in [9, 25, 26, 31]]
-    ofsCls = combine_texts(tables)
-    vocab_frame = vocabulary_frame(ofsCls)
-    tfidf, terms = tf_idf(ofsCls)
-    km = k_means(tfidf, 5)
-    # visualise_mds(tfidf, km, vocab_frame)
-
-    print("done")
 
