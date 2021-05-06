@@ -6,7 +6,7 @@ from bs4 import BeautifulSoup, NavigableString, Tag
 import json
 import tweepy as tw
 import os
-import re
+from speech_classes import SPEECH_CLASSES
 
 ##### 9
 # tab = pd.read_csv("data/9_uo.csv")
@@ -184,3 +184,27 @@ import re
 # posts = posts[['class', 'text']]
 #
 # posts.to_csv(os.path.join("data", "31.csv"))
+
+
+# Labels each class multiple times
+#### jigsaw_toxic
+# source_path = os.path.join("data", "jigsaw-toxic_uo.csv")
+# classes = ["toxic", "severe_toxic", "obscene", "threat", "insult", "identity_hate"]
+# class_ids = {c: SPEECH_CLASSES.index("unclassified offensive") if c not in SPEECH_CLASSES else SPEECH_CLASSES.index(c)
+#              for c in classes}
+# column_names = ['text']
+# column_names.extend(classes)
+# toxic_posts: pd.DataFrame = pd.read_csv(source_path, header=0, usecols=[1, 2, 3, 4, 5, 6, 7],
+#                                         names=column_names, dtype=str)
+# print(toxic_posts)
+# single_class_dataframes = list()
+# for c in classes:
+#     posts = toxic_posts[['text', c]]
+#     posts = posts[posts[c] != '0']
+#     posts['class'] = class_ids[c]
+#     posts = posts[['class', 'text']]
+#     single_class_dataframes.append(posts)
+# total = pd.concat(single_class_dataframes, ignore_index=True)
+# print(total)
+# total.to_csv(os.path.join("data", "jigsaw-toxic.csv"))
+
