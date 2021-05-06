@@ -25,3 +25,5 @@ class:
 21 - unclassified offensive
 
 files have two columns: class, text
+
+jigsaw_source = https://www.kaggle.com/c/jigsaw-toxic-comment-classification-challenge/data
