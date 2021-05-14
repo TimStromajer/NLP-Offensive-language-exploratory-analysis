@@ -21,4 +21,7 @@ SPEECH_CLASSES = [
     "political",
     "religion",
     "unclassified offensive",
+    "toxic",
+    "severe_toxic",
+    "identity_hate"
 ]
