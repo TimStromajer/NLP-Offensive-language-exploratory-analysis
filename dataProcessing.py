@@ -188,23 +188,50 @@ from speech_classes import SPEECH_CLASSES
 
 # Labels each class multiple times
 #### jigsaw_toxic
-# source_path = os.path.join("data", "jigsaw-toxic_uo.csv")
+# source_path_train = os.path.join("data", "jigsaw-toxic_train_uo.csv")
+# source_path_test = os.path.join("data", "jigsaw-toxic_test_uo.csv")
 # classes = ["toxic", "severe_toxic", "obscene", "threat", "insult", "identity_hate"]
 # class_ids = {c: SPEECH_CLASSES.index("unclassified offensive") if c not in SPEECH_CLASSES else SPEECH_CLASSES.index(c)
 #              for c in classes}
 # column_names = ['text']
 # column_names.extend(classes)
-# toxic_posts: pd.DataFrame = pd.read_csv(source_path, header=0, usecols=[1, 2, 3, 4, 5, 6, 7],
-#                                         names=column_names, dtype=str)
+# toxic_posts_train: pd.DataFrame = pd.read_csv(source_path_train, header=0, usecols=[1, 2, 3, 4, 5, 6, 7],
+#                                               names=column_names, dtype=str)
+# toxic_posts_test: pd.DataFrame = pd.read_csv(source_path_test, header=0, usecols=[1, 2, 3, 4, 5, 6, 7],
+#                                              names=column_names, dtype=str)
+# toxic_posts = pd.concat([toxic_posts_train, toxic_posts_test], ignore_index=True)
 # print(toxic_posts)
 # single_class_dataframes = list()
 # for c in classes:
 #     posts = toxic_posts[['text', c]]
-#     posts = posts[posts[c] != '0']
+#     posts = posts[posts[c] == '1']
 #     posts['class'] = class_ids[c]
 #     posts = posts[['class', 'text']]
 #     single_class_dataframes.append(posts)
+# # Find posts with all labels set to 0 and add them as non-offensive
+# clean_posts = toxic_posts.copy()
+# for c in classes:
+#     clean_posts = clean_posts[clean_posts[c] == '0']
+# clean_posts = clean_posts[['text']]
+# clean_posts['class'] = SPEECH_CLASSES.index('none')
+# clean_posts = clean_posts[['class', 'text']]
+# single_class_dataframes.append(clean_posts)
+#
 # total = pd.concat(single_class_dataframes, ignore_index=True)
-# print(total)
 # total.to_csv(os.path.join("data", "jigsaw-toxic.csv"))
 
+### count unique jigsaw
+# source_path_train = os.path.join("data", "jigsaw-toxic_train_uo.csv")
+# source_path_test = os.path.join("data", "jigsaw-toxic_test_uo.csv")
+# classes = ["toxic", "severe_toxic", "obscene", "threat", "insult", "identity_hate"]
+# class_ids = {c: SPEECH_CLASSES.index("unclassified offensive") if c not in SPEECH_CLASSES else SPEECH_CLASSES.index(c)
+#              for c in classes}
+# column_names = ['text']
+# column_names.extend(classes)
+# toxic_posts_train: pd.DataFrame = pd.read_csv(source_path_train, header=0, usecols=[1, 2, 3, 4, 5, 6, 7],
+#                                               names=column_names, dtype=str)
+# toxic_posts_test: pd.DataFrame = pd.read_csv(source_path_test, header=0, usecols=[1, 2, 3, 4, 5, 6, 7],
+#                                              names=column_names, dtype=str)
+# toxic_posts = pd.concat([toxic_posts_train, toxic_posts_test], ignore_index=True)
+# posts = toxic_posts[toxic_posts["toxic"] != '-1']
+# print(posts)
