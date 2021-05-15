@@ -1,6 +1,7 @@
 #Pickled data
 data_pickles/
 model_pickles/
+w2v_document_embeddings.py-intermediate_data/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
