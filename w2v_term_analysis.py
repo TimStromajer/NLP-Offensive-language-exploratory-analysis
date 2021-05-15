@@ -139,23 +139,13 @@ def plotPCA(title, word_clusters, embedding_clusters, filename = None):
     plot_similar_words(title, FIXED_KEYS, embeddings_en_2d, word_clusters, filename)
 
 
-model_gn = gensim.downloader.load('word2vec-google-news-300')
-word_clusters, embedding_clusters = getSimilarWords(model_gn)
-plotTSNE("Similar words - Word2Vec [t-SNE]", word_clusters, embedding_clusters)
-plotMDS("Similar words - Word2Vec [MDS]", word_clusters, embedding_clusters)
-plotPCA("Similar words - Word2Vec [PCA]", word_clusters, embedding_clusters)
-
-
-
-
-
-
-
-
-
-
-
-
+if __name__ == '__main__':
+    model_gn = gensim.downloader.load('word2vec-google-news-300')
+    word_clusters, embedding_clusters = getSimilarWords(model_gn)
+    print(np.array(embedding_clusters).shape)
+    plotTSNE("Similar words - Word2Vec [t-SNE]", word_clusters, embedding_clusters)
+    plotMDS("Similar words - Word2Vec [MDS]", word_clusters, embedding_clusters)
+    plotPCA("Similar words - Word2Vec [PCA]", word_clusters, embedding_clusters)
 
 
 

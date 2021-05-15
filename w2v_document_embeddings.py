@@ -4,8 +4,14 @@ import pandas as pd
 import os
 import pickle
 import numpy as np
-from textProcessing import tokenize
 from lazy_load import lazy
+
+from scipy.spatial import distance
+from textProcessing import tokenize
+import matplotlib.pyplot as plt
+import matplotlib.cm as cm
+from statistics import mean
+from sklearn.manifold import TSNE
 
 
 def read_document(file_path):
@@ -36,8 +42,8 @@ def embed_documents(model, posts):
     return embedded_posts
 
 
-def load_or_create(path, action):
-    if os.path.exists(path):
+def load_or_create(path, action, recreate=False):
+    if not recreate and os.path.exists(path):
         with open(path, "rb") as f:
             print(f"Loaded from {path}")
             output = pickle.load(f)
@@ -49,6 +55,50 @@ def load_or_create(path, action):
     return output
 
 
+# def plot_similar_words(title, labels, embedding_clusters, filename=None):
+#     plt.figure(figsize=(16, 9))
+#     colors = cm.rainbow(np.linspace(0, 1, len(labels)))
+#     for label, embeddings, color in zip(labels, embedding_clusters, colors):
+#         x = embeddings[:, 0]
+#         y = embeddings[:, 1]
+#         plt.scatter(x, y, c=color, alpha=0.7, label=label)
+#         plt.annotate(label.upper(), alpha=1.0, xy=(mean(x), mean(y)), xytext=(0, 0),
+#                      textcoords='offset points', ha='center', va='center', size=15)
+#     plt.legend(loc=4)
+#     plt.title(title)
+#     plt.grid(False)
+#     if filename:
+#         plt.savefig(filename, format='png', dpi=150, bbox_inches='tight')
+#     plt.show()
+#
+#
+# def plotPCA(title, labels, embedding_clusters, filename = None):
+#     lens = [len(x) for x in embedding_clusters]
+#     print("Creating array")
+#     combined_embeddings = np.empty((sum(lens), len(embedding_clusters[0][0])), dtype=np.float32)
+#     index = 0
+#     print("Filling array")
+#     for c in embedding_clusters:
+#         for embedding in c:
+#             combined_embeddings[index, :] = embedding
+#         index += 1
+#     print("Fitting PCA")
+#     #model_en_2d = PCA(n_components=2, random_state = 32)
+#     model_en_2d = TSNE(perplexity=15, n_components=2, init='pca', n_iter=3500, random_state=32)
+#     model_en_2d = model_en_2d.fit_transform(combined_embeddings)
+#     model_en_2d = np.array(model_en_2d)
+#
+#     combined_index = 0
+#     mapped_embeddings = list()
+#     for label_count in lens:
+#         label_array = np.empty((label_count, 2), dtype=np.float32)
+#         for i in range(label_count):
+#             label_array[i, :] = model_en_2d[combined_index, :]
+#             combined_index += 1
+#         mapped_embeddings.append(label_array)
+#     plot_similar_words(title, labels, mapped_embeddings, filename)
+#
+#
 intermediate_location = f"{os.path.basename(__file__)}-intermediate_data"
 if not os.path.exists(intermediate_location):
     os.mkdir(intermediate_location)
@@ -67,8 +117,12 @@ if __name__ == '__main__':
                    '26.csv',
                    '31.csv',
                    '32.csv',
-                   'jigsaw-toxic.csv'
+                   #'jigsaw-toxic.csv'
                    ]
+
+    all_posts = list()
+    all_labels = list()
+    all_embeddings = list()
 
     for file_name in input_files:
         data_path = 'data'
@@ -80,7 +134,42 @@ if __name__ == '__main__':
         embedding_file_path = os.path.join(intermediate_location, f"{file_name}-embeddings.p")
         post_embeddings = load_or_create(embedding_file_path, lambda: embed_documents(model, posts))
 
+        all_posts.extend(posts)
+        all_labels.extend(labels)
+        all_embeddings.extend(post_embeddings)
         print(len(post_embeddings))
+
+    labels_embeddings = dict()
+    label_posts = dict()
+    for i in range(len(all_labels)):
+        label = all_labels[i]
+        embedding = all_embeddings[i]
+        if label not in labels_embeddings:
+            labels_embeddings[label] = list()
+            label_posts[label] = list()
+        labels_embeddings[label].append(all_embeddings[i])
+        label_posts[label].append(all_posts[i])
+    for key, value in labels_embeddings.items():
+        labels_embeddings[key] = np.array(value)
+    embeddings = list(labels_embeddings.values())
+
+    label = '6'
+    combined = sum(labels_embeddings[label])
+    count = len(labels_embeddings[label])
+    centroid = combined/count
+    print(centroid)
+    print(count)
+    distances = distance.cdist([centroid], labels_embeddings[label], "cosine")[0]
+    print(distances)
+    distances = [e for e in distances if e < 1]
+    sort = [i[0] for i in sorted(enumerate(distances), key=lambda x:x[1])]
+    print(sort)
+    for i in range(10):
+        print(label_posts[label][sort[i]])
+    #min_distance = distances[min_index]
+    #max_similarity = 1 - min_distance
+    #print(min_distance)
+
     # tokens = tokenize(data)
     # embedding = model_gn[tokens[0]]
     #
