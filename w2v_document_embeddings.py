@@ -4,10 +4,11 @@ import pandas as pd
 import os
 import pickle
 import numpy as np
-from lazy_load import lazy
 
+from lazy_load import lazy
 from scipy.spatial import distance
-from textProcessing import tokenize
+from textProcessing import tokenize, remove_links, remove_ats, remove_consecutive_phrases
+from speech_classes import SPEECH_CLASSES
 import matplotlib.pyplot as plt
 import matplotlib.cm as cm
 from statistics import mean
@@ -35,7 +36,10 @@ def embed_documents(model, posts):
     embedded_posts = list()
     for i, post in enumerate(posts):
         print(100*i/len(posts))
+        post = remove_links(post)
+        post = remove_ats(post)
         tokens = tokenize(post)
+        tokens = remove_consecutive_phrases(tokens)
         embedded_post = embed_document(model, tokens)
         embedded_posts.append(embedded_post)
     embedded_posts.reverse()
@@ -105,6 +109,7 @@ if not os.path.exists(intermediate_location):
 
 
 if __name__ == '__main__':
+    regenerate = True
     def load_w2v():
         print("Loading word2vec...")
         w2v_model = gensim.downloader.load('word2vec-google-news-300')
@@ -117,7 +122,7 @@ if __name__ == '__main__':
                    '26.csv',
                    '31.csv',
                    '32.csv',
-                   #'jigsaw-toxic.csv'
+                   'jigsaw-toxic.csv'
                    ]
 
     all_posts = list()
@@ -132,7 +137,7 @@ if __name__ == '__main__':
         labels = list(data['class'])
 
         embedding_file_path = os.path.join(intermediate_location, f"{file_name}-embeddings.p")
-        post_embeddings = load_or_create(embedding_file_path, lambda: embed_documents(model, posts))
+        post_embeddings = load_or_create(embedding_file_path, lambda: embed_documents(model, posts), recreate=regenerate)
 
         all_posts.extend(posts)
         all_labels.extend(labels)
@@ -147,25 +152,26 @@ if __name__ == '__main__':
         if label not in labels_embeddings:
             labels_embeddings[label] = list()
             label_posts[label] = list()
-        labels_embeddings[label].append(all_embeddings[i])
+        labels_embeddings[label].append(np.array(all_embeddings[i]))
         label_posts[label].append(all_posts[i])
-    for key, value in labels_embeddings.items():
-        labels_embeddings[key] = np.array(value)
-    embeddings = list(labels_embeddings.values())
 
-    label = '6'
-    combined = sum(labels_embeddings[label])
-    count = len(labels_embeddings[label])
-    centroid = combined/count
-    print(centroid)
-    print(count)
-    distances = distance.cdist([centroid], labels_embeddings[label], "cosine")[0]
-    print(distances)
-    distances = [e for e in distances if e < 1]
-    sort = [i[0] for i in sorted(enumerate(distances), key=lambda x:x[1])]
-    print(sort)
-    for i in range(10):
-        print(label_posts[label][sort[i]])
+    for label in labels_embeddings:
+        if SPEECH_CLASSES[int(label)] == 'none':
+            continue
+        combined = sum(labels_embeddings[label])
+        count = len(labels_embeddings[label])
+        centroid = combined/count
+        distances = distance.cdist([centroid], labels_embeddings[label], "cosine")[0]
+        distances = [e for e in distances if e < 1]
+        sort = [i[0] for i in sorted(enumerate(distances), key=lambda x:x[1])]
+        print("==============")
+        print(SPEECH_CLASSES[int(label)])
+        for i in range(10):
+            no_links = remove_links(label_posts[label][sort[i]])
+            no_ats = remove_ats(no_links)
+            remove_repeating = remove_consecutive_phrases(no_ats.split())
+            remove_repeating = " ".join(remove_repeating)
+            print(f"{i+1}: {remove_repeating}")
     #min_distance = distances[min_index]
     #max_similarity = 1 - min_distance
     #print(min_distance)

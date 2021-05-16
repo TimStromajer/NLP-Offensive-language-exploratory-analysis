@@ -9,6 +9,35 @@ stemmer = SnowballStemmer("english")
 porter = PorterStemmer()
 
 
+def remove_links(text):
+    url_link_regex = r'https?:\/\/[^\s]*'
+    return re.sub(url_link_regex, '', text)
+
+
+def remove_ats(text):
+    return re.sub(r'(^|\s)@\w+', r'', text)
+
+
+def remove_consecutive_words(text):
+    return re.sub(r'\b(\w+\s*)\1+', '\\1', text)
+
+
+def remove_consecutive_phrases(tokens):
+    tokens = tokens.copy()
+    phrase_size = len(tokens)//2 + 1
+    while phrase_size > 0:
+        i = len(tokens)
+        while i >= 2*phrase_size:
+            phrase_a = tokens[i-phrase_size:i]
+            phrase_b = tokens[i-2*phrase_size:i-phrase_size]
+            i -= phrase_size
+            if phrase_a == phrase_b:
+                tokens = tokens[:i-phrase_size]+tokens[i:]
+                # print(f"{phrase_a} vs {phrase_b}")
+        phrase_size -= 1
+    return tokens
+
+
 def tokenize(raw):
     text = raw.lower()
     # remove punctuation
@@ -24,9 +53,7 @@ def stemming(tokens):
 
 
 def tokenize_and_stem(text):
-    # Remove links
-    url_link_regex = r'https?:\/\/[^\s]*'
-    text = re.sub(url_link_regex, '', text)
+    text = remove_links(text)
     # First tokenize by sentence, then by word to ensure that punctuation is caught as it's own token.
     tokens = [word for sent in nltk.sent_tokenize(text) for word in nltk.word_tokenize(sent)]
     filtered_tokens = []
@@ -41,9 +68,7 @@ def tokenize_and_stem(text):
 # same as above, but saves a mapping from stems to dictionaries of original terms and their counts
 # used for retrieving original terms
 def tokenize_and_stem_map_terms(text, stem_term_map):
-    # Remove links
-    url_link_regex = r'https?:\/\/[^\s]*'
-    text = re.sub(url_link_regex, '', text)
+    text = remove_links(text)
     # First tokenize by sentence, then by word to ensure that punctuation is caught as it's own token.
     tokens = [word for sent in nltk.sent_tokenize(text) for word in nltk.word_tokenize(sent)]
     filtered_tokens = []
