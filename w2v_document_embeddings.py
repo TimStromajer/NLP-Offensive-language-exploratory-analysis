@@ -4,6 +4,7 @@ import pandas as pd
 import os
 import pickle
 import numpy as np
+from sentence_transformers.util import pytorch_cos_sim
 
 from lazy_load import lazy
 from scipy.spatial import distance
@@ -109,7 +110,7 @@ if not os.path.exists(intermediate_location):
 
 
 if __name__ == '__main__':
-    regenerate = True
+    regenerate = False
     def load_w2v():
         print("Loading word2vec...")
         w2v_model = gensim.downloader.load('word2vec-google-news-300')
@@ -122,7 +123,7 @@ if __name__ == '__main__':
                    '26.csv',
                    '31.csv',
                    '32.csv',
-                   'jigsaw-toxic.csv'
+                   #'jigsaw-toxic.csv'
                    ]
 
     all_posts = list()
@@ -133,6 +134,7 @@ if __name__ == '__main__':
         data_path = 'data'
         file_path = os.path.join(data_path, file_name)
         data = read_document(file_path)
+        data = data[data['class'] != '0']
         posts = list(data['text'])
         labels = list(data['class'])
 
@@ -172,6 +174,23 @@ if __name__ == '__main__':
             remove_repeating = remove_consecutive_phrases(no_ats.split())
             remove_repeating = " ".join(remove_repeating)
             print(f"{i+1}: {remove_repeating}")
+
+    combined_labels = []
+    combined_embeddings = []
+    for label in labels_embeddings:
+        for embedding in labels_embeddings[label]:
+            combined_labels.append(label)
+            combined_embeddings.append(embedding)
+
+    print(len(combined_embeddings))
+    distances = pytorch_cos_sim(combined_embeddings, combined_embeddings)
+    print(distances)
+    # for i, embedding in enumerate(combined_embeddings):
+    #     print(100*i/len(combined_embeddings))
+    #     distances = distance.cdist([embedding], combined_embeddings, "cosine")[0]
+    print("computed")
+
+
     #min_distance = distances[min_index]
     #max_similarity = 1 - min_distance
     #print(min_distance)
