@@ -10,10 +10,7 @@ from lazy_load import lazy
 from scipy.spatial import distance
 from textProcessing import tokenize, remove_links, remove_ats, remove_consecutive_phrases
 from speech_classes import SPEECH_CLASSES
-import matplotlib.pyplot as plt
-import matplotlib.cm as cm
-from statistics import mean
-from sklearn.manifold import TSNE
+from torch import mean, argsort
 
 
 def read_document(file_path):
@@ -60,50 +57,6 @@ def load_or_create(path, action, recreate=False):
     return output
 
 
-# def plot_similar_words(title, labels, embedding_clusters, filename=None):
-#     plt.figure(figsize=(16, 9))
-#     colors = cm.rainbow(np.linspace(0, 1, len(labels)))
-#     for label, embeddings, color in zip(labels, embedding_clusters, colors):
-#         x = embeddings[:, 0]
-#         y = embeddings[:, 1]
-#         plt.scatter(x, y, c=color, alpha=0.7, label=label)
-#         plt.annotate(label.upper(), alpha=1.0, xy=(mean(x), mean(y)), xytext=(0, 0),
-#                      textcoords='offset points', ha='center', va='center', size=15)
-#     plt.legend(loc=4)
-#     plt.title(title)
-#     plt.grid(False)
-#     if filename:
-#         plt.savefig(filename, format='png', dpi=150, bbox_inches='tight')
-#     plt.show()
-#
-#
-# def plotPCA(title, labels, embedding_clusters, filename = None):
-#     lens = [len(x) for x in embedding_clusters]
-#     print("Creating array")
-#     combined_embeddings = np.empty((sum(lens), len(embedding_clusters[0][0])), dtype=np.float32)
-#     index = 0
-#     print("Filling array")
-#     for c in embedding_clusters:
-#         for embedding in c:
-#             combined_embeddings[index, :] = embedding
-#         index += 1
-#     print("Fitting PCA")
-#     #model_en_2d = PCA(n_components=2, random_state = 32)
-#     model_en_2d = TSNE(perplexity=15, n_components=2, init='pca', n_iter=3500, random_state=32)
-#     model_en_2d = model_en_2d.fit_transform(combined_embeddings)
-#     model_en_2d = np.array(model_en_2d)
-#
-#     combined_index = 0
-#     mapped_embeddings = list()
-#     for label_count in lens:
-#         label_array = np.empty((label_count, 2), dtype=np.float32)
-#         for i in range(label_count):
-#             label_array[i, :] = model_en_2d[combined_index, :]
-#             combined_index += 1
-#         mapped_embeddings.append(label_array)
-#     plot_similar_words(title, labels, mapped_embeddings, filename)
-#
-#
 intermediate_location = f"{os.path.basename(__file__)}-intermediate_data"
 if not os.path.exists(intermediate_location):
     os.mkdir(intermediate_location)
@@ -123,7 +76,7 @@ if __name__ == '__main__':
                    '26.csv',
                    '31.csv',
                    '32.csv',
-                   #'jigsaw-toxic.csv'
+                   'jigsaw-toxic.csv'
                    ]
 
     all_posts = list()
@@ -157,9 +110,8 @@ if __name__ == '__main__':
         labels_embeddings[label].append(np.array(all_embeddings[i]))
         label_posts[label].append(all_posts[i])
 
+    # Centroid based representative
     for label in labels_embeddings:
-        if SPEECH_CLASSES[int(label)] == 'none':
-            continue
         combined = sum(labels_embeddings[label])
         count = len(labels_embeddings[label])
         centroid = combined/count
@@ -175,29 +127,18 @@ if __name__ == '__main__':
             remove_repeating = " ".join(remove_repeating)
             print(f"{i+1}: {remove_repeating}")
 
-    combined_labels = []
-    combined_embeddings = []
-    for label in labels_embeddings:
-        for embedding in labels_embeddings[label]:
-            combined_labels.append(label)
-            combined_embeddings.append(embedding)
 
-    print(len(combined_embeddings))
-    distances = pytorch_cos_sim(combined_embeddings, combined_embeddings)
-    print(distances)
-    # for i, embedding in enumerate(combined_embeddings):
-    #     print(100*i/len(combined_embeddings))
-    #     distances = distance.cdist([embedding], combined_embeddings, "cosine")[0]
-    print("computed")
-
-
-    #min_distance = distances[min_index]
-    #max_similarity = 1 - min_distance
-    #print(min_distance)
-
-    # tokens = tokenize(data)
-    # embedding = model_gn[tokens[0]]
-    #
-    # print(model_gn.most_similar(tokens[0]))
-    # print(model_gn.similar_by_vector(embedding))
+    # Distance based representative
+    for label, embeddings in labels_embeddings.items():
+        distances = pytorch_cos_sim(embeddings, embeddings)
+        averages = mean(distances, dim=1)
+        indexs = argsort(averages, descending=True)
+        print("==============")
+        print(SPEECH_CLASSES[int(label)])
+        for i in range(10):
+            no_links = remove_links(label_posts[label][indexs[i].item()])
+            no_ats = remove_ats(no_links)
+            remove_repeating = remove_consecutive_phrases(no_ats.split())
+            remove_repeating = " ".join(remove_repeating)
+            print(f"{i+1}: {remove_repeating}")
 
