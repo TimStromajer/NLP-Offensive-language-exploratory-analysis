@@ -9,7 +9,7 @@ from sklearn.cluster import KMeans
 from sklearn.decomposition import PCA
 from nltk.corpus import stopwords
 
-from textProcessing import tokenize_and_stem, vocabulary_frame, tokenize_and_stem_map_terms
+from textProcessing import tokenize_and_stem, vocabulary_frame, tokenize_and_stem_map_terms, remove_ats, remove_links, remove_consecutive_phrases
 from speech_classes import SPEECH_CLASSES
 
 
@@ -36,6 +36,10 @@ def combine_texts(tabs):
         for row in table_data.iterrows():
             id = row[1]["class"]
             text = row[1]["text"]
+            text = remove_links(text)
+            text = remove_ats(text)
+            text = remove_consecutive_phrases(text.split())
+            text = " ".join(text)
             speech_classes[id] += text + " "
         with open(filename, "wb") as f:
             pickle.dump(speech_classes, f)

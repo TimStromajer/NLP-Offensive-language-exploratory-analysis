@@ -1,108 +1,63 @@
-Cluster 0: obscene, threat, insult, toxic, severe_toxic, identity_hate
-	nigger nigger nigger
-	nigger nigger
-	fuck fuck fuck
-	ass ass ass
-	wikipedia
-	die die
-	ass ass
-	die die die
-	vandal
-	faggot faggot faggot
-	suck suck suck
-	faggot faggot
-	go fuck go
-	suck suck
-	fuck go fuck
-	shit shit
-	hate hate
-	hate hate hate
-	moron his
-	must die
-
-
-Cluster 1: profane, hateful
-	icc
-	borisjohnson
-	world cup
-	impeachtrump
-	cricket
-	traitortrump
-	boris
-	bcci
-	impeach
-	gloves
-	maga
-	potus
-	oral
-	congress
-	tariffs
-	dhoni
-	bengal
-	senatemajldr
-	brexit
-	tory
-
-
-Cluster 2: offensive, abusive, cyberbullying, appearance-related, intellectual
-	bitch rt
-	riot
-	bad bitch
-	fuck rt
-	op
-	dickface
-	u dumb fuck
-	tard
-	u dumb
-	assface
-	asswipe
-	cockhead
-	niggah
-	fugly
-	fatass eat
-	r r
-	ass rt
-	gym
-	this threads
-	bad ass
-
-
-Cluster 3: political, unclassified offensive
+Cluster 0: political, unclassified offensive
 	ruski
-	fuckbags
+	fuckbag
 	dickwad
 	hrc
 	spook
 	notmypresident
-	keitholbermann
-	realdonaldtrump 's
 	deplorable
-	realdonaldtrump know
-	ass-hat
 	stupid liberal
-	realdonaldtrump was
+	ass-hat
 	baggy
 	rnc
 	's set
-	realdonaldtrump 're
+	rt fuck
 	clinton
-	another black person
+	rt cause
+	shithead 's
+	lol rt
 	barbie
+	ambassador
+	another black person
 
 
-Cluster 4: homophobic, sexist
+Cluster 1: obscene, threat, insult, toxic, severe_toxic, identity_hate
+	wikipedia
+	vandalism
+	revert
+	talk page
+	wiki
+	ip
+	editors
+	homosexual
+	person attack
+	this article
+	this page
+	wp
+	unblock
+	utc
+	eat shit
+	fuck wikipedia
+	suck cock
+	encyclopedia
+	billcj
+	this site
+
+
+Cluster 2: homophobic, sexist
 	milf
 	call faggot
 	gt gt
+	faggot faggot
 	say faggot
 	gallery
-	faggot faggot
+	faggot look
 	like dyke
 	this dyke
-	eminem
 	findom
-	straight men
 	gt gt gt
+	straight men
+	eminem
 	feminazi
 	p ssy
 	full video
@@ -110,29 +65,74 @@ Cluster 4: homophobic, sexist
 	big tits
 	latina
 	make want
-	look like dyke
+
+
+Cluster 3: offensive, abusive, cyberbullying, appearance-related, intellectual
+	bitch rt
+	riot
+	bad bitch
+	fuck rt
+	rt bitch
+	op
+	rt fuck
+	dickface
+	u dumb fuck
+	rt this
+	tard
+	rt 'm
+	rt n't
+	u dumb
+	assface
+	asswipe
+	cockhead
+	fugly
+	niggah
+	fatass eat
+
+
+Cluster 4: profane, hateful
+	world cup
+	cricket
+	impeachtrump
+	boris
+	traitortrump
+	gloves
+	impeach
+	dhoni
+	congress
+	maga
+	bengal
+	oral
+	coon
+	tariffs
+	tory
+	brexit
+	tournament
+	trump 's
+	trumprussia
+	democracy
 
 
 Cluster 5: none, racist, religion
 	buildthewall
 	surrender
+	nigga nigga
 	nigga said
 	hillbilly
-	muzzie
 	nigga this
-	nigga nigga
+	muzzie
 	nigga look
 	van dyke
-	nigga was
 	maga
-	call nigger
+	nigga was
 	islamist
-	lil nigga
-	nigga really
+	call nigger
 	like nigga
+	nigga really
+	lil nigga
 	young nigga
-	nigga like
 	victim card
+	nigga like
 	sjw
 
 
