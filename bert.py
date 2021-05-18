@@ -215,8 +215,8 @@ def cosine_dist(vec1, vec2):
 def visualize_dendrogram():
     dists = []
     labels = []
-    for i, m1 in enumerate(mean3):
-        for j, m2 in enumerate(mean3):
+    for i, m1 in enumerate(mean):
+        for j, m2 in enumerate(mean):
             if j > i:
                 dist = cosine(m1, m2)
                 if dist > 0:
@@ -246,10 +246,10 @@ if __name__ == '__main__':
 
     # mean and sentences saved in bert_vectors.py
     # tables = ["jigsaw-toxic.csv"]
-    # chosen_class = 24
+    # chosen_class = 11
     # model, tokenizer = load_model_and_tokenizer()
-    # texts = get_texts(tables, chosen_class, added_sent=True)
-    # class_mean, sentence = get_class_mean_and_sentence(model, tokenizer, texts, chosen_class, only_class_word=True)
+    # texts = get_texts(tables, chosen_class, added_sent=False)
+    # class_mean, sentence = get_class_mean_and_sentence(model, tokenizer, texts, chosen_class, only_class_word=False)
     # print(sentence)
     # print(class_mean)
 
