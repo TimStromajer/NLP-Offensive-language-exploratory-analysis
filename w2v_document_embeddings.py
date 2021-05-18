@@ -4,6 +4,7 @@ import pandas as pd
 import os
 import pickle
 import numpy as np
+import csv
 
 from lazy_load import lazy
 from scipy.spatial import distance
@@ -64,6 +65,8 @@ def document_group_similarities(a_embeddings, b_embeddings):
     b_to_a_averages = mean(distances, dim=0)
     top_a_to_b = argsort(a_to_b_averages, descending=True)
     top_b_to_a = argsort(b_to_a_averages, descending=True)
+    print([a_to_b_averages[i.item()] for i in top_a_to_b[:5]])
+    print([b_to_a_averages[i.item()] for i in top_b_to_a[:5]])
     a_to_b = mean(a_to_b_averages)
     b_to_a = mean(b_to_a_averages)
     return a_to_b, b_to_a, top_a_to_b, top_b_to_a
@@ -121,6 +124,8 @@ if __name__ == '__main__':
             label_posts[label] = list()
         labels_embeddings[label].append(np.array(all_embeddings[i]))
         label_posts[label].append(all_posts[i])
+
+    print([SPEECH_CLASSES[int(label)] for label in label_posts.keys()])
 
     top_count = 3
 
@@ -188,3 +193,9 @@ if __name__ == '__main__':
 
 print([SPEECH_CLASSES[int(label)] for label in labels])
 print(label_distances)
+
+with open("distances.csv", 'w') as f:
+    writer = csv.writer(f)
+    writer.writerow([SPEECH_CLASSES[int(label)] for label in labels])
+    for i in range(label_distances.shape[0]):
+        writer.writerow(label_distances[i, :])

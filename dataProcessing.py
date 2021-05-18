@@ -208,6 +208,10 @@ for c in classes:
     posts['class'] = class_ids[c]
     posts = posts[['class', 'text']]
     single_class_dataframes.append(posts)
+
+total = pd.concat(single_class_dataframes, ignore_index=True)
+total.to_csv(os.path.join("data", "jigsaw-toxic-no-none.csv"))
+
 # Find posts with all labels set to 0 and add them as non-offensive
 clean_posts = toxic_posts.copy()
 for c in classes:

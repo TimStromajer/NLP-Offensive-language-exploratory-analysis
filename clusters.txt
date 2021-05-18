@@ -1,78 +1,138 @@
-Cluster 0: ['intellectual', 'political', 'unclassified offensive']
-	['fuckhead']
-	['tard']
-	['spook']
-	['u', 'dumb']
-	['hrc']
-	['fuck', 'rt']
-	['libtard']
-	['douche', 'bag']
-	['fuckoff']
-	['notmypresident']
+Cluster 0: obscene, threat, insult, toxic, severe_toxic, identity_hate
+	nigger nigger nigger
+	nigger nigger
+	fuck fuck fuck
+	ass ass ass
+	wikipedia
+	die die
+	ass ass
+	die die die
+	vandal
+	faggot faggot faggot
+	suck suck suck
+	faggot faggot
+	go fuck go
+	suck suck
+	fuck go fuck
+	shit shit
+	hate hate
+	hate hate hate
+	moron his
+	must die
 
 
-Cluster 1: ['none', 'racist', 'homophobic', 'sexist']
-	['dyke']
-	['white', 'trash']
-	['milf']
-	['nigga', 'said']
-	['surrender']
-	['buildthewall']
-	['nigga', 'got']
-	['hillbilly']
-	['gt', 'gt']
-	['nigga', 'nigga']
+Cluster 1: profane, hateful
+	icc
+	borisjohnson
+	world cup
+	impeachtrump
+	cricket
+	traitortrump
+	boris
+	bcci
+	impeach
+	gloves
+	maga
+	potus
+	oral
+	congress
+	tariffs
+	dhoni
+	bengal
+	senatemajldr
+	brexit
+	tory
 
 
-Cluster 2: ['profane', 'hateful']
-	['icc']
-	['rapist']
-	['world', 'cup']
-	['borisjohnson']
-	['fag']
-	['boris']
-	['impeachtrump']
-	['cricket']
-	['this', 'world']
-	['traitortrump']
+Cluster 2: offensive, abusive, cyberbullying, appearance-related, intellectual
+	bitch rt
+	riot
+	bad bitch
+	fuck rt
+	op
+	dickface
+	u dumb fuck
+	tard
+	u dumb
+	assface
+	asswipe
+	cockhead
+	niggah
+	fugly
+	fatass eat
+	r r
+	ass rt
+	gym
+	this threads
+	bad ass
 
 
-Cluster 3: ['appearance-related']
-	['fatass']
-	['skank']
-	['camel']
-	['fuckface']
-	['gym']
-	['pizza']
-	['grandpa']
-	['christmas']
-	['lose', 'weight']
-	['gross']
+Cluster 3: political, unclassified offensive
+	ruski
+	fuckbags
+	dickwad
+	hrc
+	spook
+	notmypresident
+	keitholbermann
+	realdonaldtrump 's
+	deplorable
+	realdonaldtrump know
+	ass-hat
+	stupid liberal
+	realdonaldtrump was
+	baggy
+	rnc
+	's set
+	realdonaldtrump 're
+	clinton
+	another black person
+	barbie
 
 
-Cluster 4: ['religion']
-	['terrorism']
-	['religion']
-	['muzzie']
-	['surrender']
-	['jew']
-	['spring']
-	['legacy']
-	['buildthewall']
-	['victim', 'card']
-	['graham']
+Cluster 4: homophobic, sexist
+	milf
+	call faggot
+	gt gt
+	say faggot
+	gallery
+	faggot faggot
+	like dyke
+	this dyke
+	eminem
+	findom
+	straight men
+	gt gt gt
+	feminazi
+	p ssy
+	full video
+	ssy
+	big tits
+	latina
+	make want
+	look like dyke
 
 
-Cluster 5: ['offensive', 'abusive', 'cyberbullying']
-	['bitch', 'rt']
-	['riot']
-	['bad', 'bitch']
-	['op']
-	['ing']
-	['fuck', 'idiot']
-	['bitch', "n't"]
-	["n't", 'fuck']
-	['bad', 'ass']
-	['bitch', 'like']
+Cluster 5: none, racist, religion
+	buildthewall
+	surrender
+	nigga said
+	hillbilly
+	muzzie
+	nigga this
+	nigga nigga
+	nigga look
+	van dyke
+	nigga was
+	maga
+	call nigger
+	islamist
+	lil nigga
+	nigga really
+	like nigga
+	young nigga
+	nigga like
+	victim card
+	sjw
 
 
