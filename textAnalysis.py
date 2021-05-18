@@ -9,7 +9,7 @@ from sklearn.cluster import KMeans
 from sklearn.decomposition import PCA
 from nltk.corpus import stopwords
 
-from textProcessing import tokenize_and_stem, vocabulary_frame, tokenize_and_stem_map_terms
+from textProcessing import tokenize_and_stem, vocabulary_frame, tokenize_and_stem_map_terms, remove_ats, remove_links, remove_consecutive_phrases
 from speech_classes import SPEECH_CLASSES
 
 
@@ -36,6 +36,10 @@ def combine_texts(tabs):
         for row in table_data.iterrows():
             id = row[1]["class"]
             text = row[1]["text"]
+            text = remove_links(text)
+            text = remove_ats(text)
+            text = remove_consecutive_phrases(text.split())
+            text = " ".join(text)
             speech_classes[id] += text + " "
         with open(filename, "wb") as f:
             pickle.dump(speech_classes, f)
@@ -112,7 +116,7 @@ def k_means(matrix, k):
 
 if __name__ == '__main__':
     k = 6
-    tables = [f"{i}.csv" for i in [9, 21, 25, 26, 31, 32]]
+    tables = [f"{i}.csv" for i in [9, 21, 25, 26, 31, 32, 'jigsaw-toxic-no-none']]
     documents, classes = combine_texts(tables)
     tfidf, terms, stem_term_map = tf_idf(documents)
     dense = tfidf.todense()
@@ -142,11 +146,11 @@ if __name__ == '__main__':
 
     with open("clusters.txt", "w") as f:
         for i in range(k):
-            f.write(f"Cluster {i}: {cluster_classes[i]}\n")
-            for ind in order_centroids[i, :10]:
+            f.write(f"Cluster {i}: {', '.join(cluster_classes[i])}\n")
+            for ind in order_centroids[i, :20]:
                 output_term = [stem_term_map[term] for term in terms[ind].split()]
                 output_term = [max(term, key=term.get) for term in output_term]
-                f.write(f"\t{output_term}\n")
+                f.write(f"\t{' '.join(output_term)}\n")
             f.write("\n\n")
 
     pca = PCA(n_components=2)

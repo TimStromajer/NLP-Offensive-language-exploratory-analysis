@@ -21,4 +21,10 @@ SPEECH_CLASSES = [
     "political",
     "religion",
     "unclassified offensive",
+    "toxic",
+    "severe_toxic",
+    "identity_hate"
 ]
+
+if __name__ == '__main__':
+    print(list(enumerate(SPEECH_CLASSES)))
