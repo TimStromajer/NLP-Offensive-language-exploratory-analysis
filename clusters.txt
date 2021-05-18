@@ -1,138 +1,40 @@
-Cluster 0: political, unclassified offensive
-	ruski
-	fuckbag
-	dickwad
-	hrc
-	spook
-	notmypresident
-	deplorable
-	stupid liberal
-	ass-hat
-	baggy
-	rnc
-	's set
-	rt fuck
-	clinton
-	rt cause
-	shithead 's
-	lol rt
-	barbie
-	ambassador
-	another black person
+Cluster 0: obscene, threat, insult, toxic, severe_toxic, identity_hate
+	['wikipedia', 'vandalism', 'revert', 'wiki', 'ip', 'homosexual', 'editors', 'unblock', 'billcj', 'wp', 'utc', 'encyclopedia', 'vandalising', 'cking', 'anti-semite', 'wikipedians', 'undo', 'sockpuppet', 'rvv', 'anus']
 
 
-Cluster 1: obscene, threat, insult, toxic, severe_toxic, identity_hate
-	wikipedia
-	vandalism
-	revert
-	talk page
-	wiki
-	ip
-	editors
-	homosexual
-	person attack
-	this article
-	this page
-	wp
-	unblock
-	utc
-	eat shit
-	fuck wikipedia
-	suck cock
-	encyclopedia
-	billcj
-	this site
+Cluster 1: offensive, abusive, racist
+	['hillbilly', 'niggah', 'beaner', 'wrestlemania', 'bird', 'sequel', 'terrifying', 'april', 'rn', 'spic', 'maga', 'hella', 'syria', 'surrender', 'nig', 'retweet', 'nigguh', 'bae', 'booty', 'aye']
 
 
-Cluster 2: homophobic, sexist
-	milf
-	call faggot
-	gt gt
-	faggot faggot
-	say faggot
-	gallery
-	faggot look
-	like dyke
-	this dyke
-	findom
-	gt gt gt
-	straight men
-	eminem
-	feminazi
-	p ssy
-	full video
-	ssy
-	big tits
-	latina
-	make want
+Cluster 2: profane, hateful
+	['cricket', 'impeachtrump', 'boris', 'gloves', 'impeachment', 'dhoni', 'maga', 'congress', 'bengal', 'oral', 'coon', 'tory', 'brexit', 'tournament', 'trump2020', 'notmypresident', 'democracy', 'theresistance', 'mp', 'nig']
 
 
-Cluster 3: offensive, abusive, cyberbullying, appearance-related, intellectual
-	bitch rt
-	riot
-	bad bitch
-	fuck rt
-	rt bitch
-	op
-	rt fuck
-	dickface
-	u dumb fuck
-	rt this
-	tard
-	rt 'm
-	rt n't
-	u dumb
-	assface
-	asswipe
-	cockhead
-	fugly
-	niggah
-	fatass eat
+Cluster 3: political
+	['fuckbag', 'dickwad', 'clinton', 'notmypresident', 'ruski', 'cheeto', 'deplorable', 'hrc', 'snowflake', 'cia', 'ned', 'cnn', 'donnie', 'asswipe', 'nomination', 'manufacturing', 'jan', 'ass-hat', 'duchebag', 'sleaze']
 
 
-Cluster 4: profane, hateful
-	world cup
-	cricket
-	impeachtrump
-	boris
-	traitortrump
-	gloves
-	impeach
-	dhoni
-	congress
-	maga
-	bengal
-	oral
-	coon
-	tariffs
-	tory
-	brexit
-	tournament
-	trump 's
-	trumprussia
-	democracy
+Cluster 4: cyberbullying
+	['riot', 'op', 'forum', 'ip', 'hacker', 'gd', 'it.', 'teammates', 'boost', 'increase', 'silver', 'stacks', 'me.', 'mana', 'summon', 'feedback', 'diamond', 'range', 'dunk', 'queue']
 
 
-Cluster 5: none, racist, religion
-	buildthewall
-	surrender
-	nigga nigga
-	nigga said
-	hillbilly
-	nigga this
-	muzzie
-	nigga look
-	van dyke
-	maga
-	nigga was
-	islamist
-	call nigger
-	like nigga
-	nigga really
-	lil nigga
-	young nigga
-	victim card
-	nigga like
-	sjw
+Cluster 5: religion
+	['muzzie', 'surrender', 'islamist', 'spring', 'maga', 'graham', 'gabrielle', 'jihad', 'syria', 'gaza', 'appease', 'mosque', 'yummy', 'fanatic', 'whoa', 'instant', 'sigh', 'invasion', 'radical', 'raghead']
+
+
+Cluster 6: intellectual
+	['tard', 'asswipe', 'cockhead', 'ass-hat', 'dickface', 'fuckwit', 'shitface', 'shat', 'pickup', 'steroid', 'lmaooo', 'dickwad', 'dumbfuck', 'eve', 'identity', 'romo', 'dense', 'uninformed', 'ceo', 'fave']
+
+
+Cluster 7: sexist
+	['gallery', 'feminazi', 'ssy', 'latina', 'angelina', 'teasing', 'valentine', 'blonde', 'alexis', 'tory', 'lisa', 'sjw', 'juicy', 'vid', 'dicksucking', 'gorgeous', 'pornstar', 'benz', 'trimmed', 'eva']
+
+
+Cluster 8: appearance-related
+	['assface', 'dickface', 'fugly', 'gym', 'shitface', 'grandpa', 'dm', 'rn', 'taco', 'pumpkin', 'cuntface', 'salad', 'snack', 'von', 'merry', 'plate', 'santa', 'unfollow', 'cream', 'autocorrect']
+
+
+Cluster 9: homophobic
+	['eminem', 'strap', 'alpha', 'retweet', 'humiliation', 'fuckhole', 'sjw', 'sale', 'str8', 'vid', 'radiates', 'outfit', 'gf', 'worship', 'jacket', 'halloween', 'bdsm', 'haircut', 'beta', 'rn']
 
 

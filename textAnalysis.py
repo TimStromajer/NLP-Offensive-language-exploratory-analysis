@@ -83,7 +83,7 @@ def tf_idf(texts):
             min_df=5,
             use_idf=True,
             tokenizer=tokenizer_function,
-            ngram_range=(1, 3)
+            ngram_range=(1, 1)
         )
         print(f"Performing TfIdf...")
         tfidf = vect.fit_transform(texts)
@@ -108,15 +108,15 @@ def k_means(matrix, k):
         return km
     except FileNotFoundError:
         print(f"Performing K-Means clustering with k={k}...")
-        km = KMeans(n_clusters=k, init="k-means++", max_iter=10000, n_init=1000)
+        km = KMeans(n_clusters=k, init="k-means++", max_iter=500, n_init=500)
         km.fit(matrix)
         joblib.dump(km, filename)
         return km
 
 
 if __name__ == '__main__':
-    k = 6
-    tables = [f"{i}.csv" for i in [9, 21, 25, 26, 31, 32, 'jigsaw-toxic-no-none']]
+    k = 8
+    tables = [f"{i}.csv" for i in [9, 21, 25, 26, 31, 32, 'jigsaw-toxic']]
     documents, classes = combine_texts(tables)
     tfidf, terms, stem_term_map = tf_idf(documents)
     dense = tfidf.todense()
@@ -147,10 +147,12 @@ if __name__ == '__main__':
     with open("clusters.txt", "w") as f:
         for i in range(k):
             f.write(f"Cluster {i}: {', '.join(cluster_classes[i])}\n")
+            cluster_terms = list()
             for ind in order_centroids[i, :20]:
                 output_term = [stem_term_map[term] for term in terms[ind].split()]
                 output_term = [max(term, key=term.get) for term in output_term]
-                f.write(f"\t{' '.join(output_term)}\n")
+                cluster_terms.extend(output_term)
+            f.write(f"\t{cluster_terms}\n")
             f.write("\n\n")
 
     pca = PCA(n_components=2)

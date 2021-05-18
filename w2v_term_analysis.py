@@ -12,27 +12,19 @@ pd.options.display.max_columns = None
 
 import matplotlib.pyplot as plt
 import matplotlib.cm as cm
+from sentence_transformers.util import pytorch_cos_sim
 
 from matplotlib.axes._axes import _log as matplotlib_axes_logger
 matplotlib_axes_logger.setLevel('ERROR')
 
 TOP_N = 30
 KEYS = {
-    "offensive": set(),
-    "abusive": set(),
-    "cyberbullying": set(),
-    "vulgar": set(),
-    "racist": set(),
-    "homophobic": set(),
-    "profane": set(),
-    "slur": set(),
-    "harrasment": set(),
-    "obscene": set(),
-    "threat": set(),
-    "discredit": set(),
-    "hateful": set(),
-    "insult": set(),
-    "hostile": set()
+    "obscene": ['wikipedia', 'vandalism', 'revert', 'wiki', 'ip', 'homosexual', 'editors', 'unblock', 'billcj', 'wp', 'utc', 'encyclopedia', 'vandalising', 'cking', 'anti-semite', 'wikipedians', 'undo', 'sockpuppet', 'rvv', 'anus'],
+    "offensive, abusive, racist": ['hillbilly', 'niggah', 'beaner', 'wrestlemania', 'bird', 'sequel', 'terrifying', 'april', 'rn', 'spic', 'maga', 'hella', 'syria', 'surrender', 'nig', 'retweet', 'nigguh', 'bae', 'booty', 'aye'],
+    "profane, hateful": ['cricket', 'impeachtrump', 'boris', 'gloves', 'impeachment', 'dhoni', 'maga', 'congress', 'bengal', 'oral', 'coon', 'tory', 'brexit', 'tournament', 'trump2020', 'notmypresident', 'democracy', 'theresistance', 'mp', 'nig'],
+    "political": ['fuckbag', 'dickwad', 'clinton', 'notmypresident', 'ruski', 'cheeto', 'deplorable', 'hrc', 'snowflake', 'cia', 'ned', 'cnn', 'donnie', 'asswipe', 'nomination', 'manufacturing', 'jan', 'ass-hat', 'duchebag', 'sleaze'],
+    "cyberbullying": ['riot', 'op', 'forum', 'ip', 'hacker', 'gd', 'it.', 'teammates', 'boost', 'increase', 'silver', 'stacks', 'me.', 'mana', 'summon', 'feedback', 'diamond', 'range', 'dunk', 'queue'],
+    "religion": ['muzzie', 'surrender', 'islamist', 'spring', 'maga', 'graham', 'gabrielle', 'jihad', 'syria', 'gaza', 'appease', 'mosque', 'yummy', 'fanatic', 'whoa', 'instant', 'sigh', 'invasion', 'radical', 'raghead']
 }
 FIXED_KEYS = list(KEYS.keys())
 
@@ -43,9 +35,9 @@ ps = PorterStemmer()
 for key in KEYS.keys():
     lemma = lemmatizer.lemmatize(key)
     stem = ps.stem(key)
-    KEYS[key].add(lemma)
-    KEYS[key].add(stem)
-    KEYS[key].add(key)
+    # KEYS[key].add(lemma)
+    # KEYS[key].add(stem)
+    # KEYS[key].add(key)
 
 
 def same_word(similar_word, ommit_words):
@@ -112,10 +104,10 @@ def plot_similar_words(title, labels, embedding_clusters, word_clusters, filenam
     plt.show()
 
 
-def plotTSNE(title, word_clusters, embedding_clusters, filename = None):
+def plotTSNE(title, word_clusters, embedding_clusters, perplexity=15, filename=None):
     embedding_clusters = np.array(embedding_clusters)
     n, m, k = embedding_clusters.shape
-    model_en_2d = TSNE(perplexity=15, n_components=2, init='pca', n_iter=3500, random_state=32)
+    model_en_2d = TSNE(perplexity=perplexity, n_components=2, init='pca', n_iter=3500, random_state=32)
     model_en_2d = model_en_2d.fit_transform(embedding_clusters.reshape(n * m, k))
     embeddings_en_2d = np.array(model_en_2d).reshape(n, m, 2)
     plot_similar_words(title, FIXED_KEYS, embeddings_en_2d, word_clusters, filename)
@@ -140,12 +132,36 @@ def plotPCA(title, word_clusters, embedding_clusters, filename = None):
 
 
 if __name__ == '__main__':
+    print("Loading model...")
     model_gn = gensim.downloader.load('word2vec-google-news-300')
-    word_clusters, embedding_clusters = getSimilarWords(model_gn)
-    print(np.array(embedding_clusters).shape)
-    plotTSNE("Similar words - Word2Vec [t-SNE]", word_clusters, embedding_clusters)
-    plotMDS("Similar words - Word2Vec [MDS]", word_clusters, embedding_clusters)
-    plotPCA("Similar words - Word2Vec [PCA]", word_clusters, embedding_clusters)
+    print("Loaded")
+    word_clusters = list()
+    embedding_clusters = list()
+    for key in FIXED_KEYS:
+        words = [word for word in (KEYS[key])if word in model_gn]
+        embeddings = [model_gn[word] for word in words if word in model_gn]
+        word_clusters.append(words)
+        embedding_clusters.append(embeddings)
+    min_len = len(min(embedding_clusters, key=len))
+    print(min_len)
+    word_clusters = [cluster[:min_len] for cluster in word_clusters]
+    embedding_clusters = [cluster[:min_len] for cluster in embedding_clusters]
+    # word_clusters, embedding_clusters = getSimilarWords(model_gn)
+    # print(np.array(embedding_clusters).shape)
+
+    # plotTSNE("Similar words - Word2Vec [t-SNE]", word_clusters, embedding_clusters, perplexity=5)
+    # plotTSNE("Similar words - Word2Vec [t-SNE]", word_clusters, embedding_clusters, perplexity=10)
+    # plotTSNE("Similar words - Word2Vec [t-SNE]", word_clusters, embedding_clusters, perplexity=20)
+    # plotTSNE("Similar words - Word2Vec [t-SNE]", word_clusters, embedding_clusters, perplexity=40)
+    # plotTSNE("Similar words - Word2Vec [t-SNE]", word_clusters, embedding_clusters, perplexity=80)
+    # plotMDS("Similar words - Word2Vec [MDS]", word_clusters, embedding_clusters)
+    # plotPCA("Similar words - Word2Vec [PCA]", word_clusters, embedding_clusters)
+
+    centroids = [sum(embeddings) for embeddings in embedding_clusters]
+    similarity = pytorch_cos_sim(centroids, centroids)
+    print(FIXED_KEYS)
+    print(similarity)
+
 
 
 

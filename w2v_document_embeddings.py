@@ -83,7 +83,7 @@ if not os.path.exists(intermediate_location):
 
 
 if __name__ == '__main__':
-    regenerate = True
+    regenerate = False
     def load_w2v():
         print("Loading word2vec...")
         w2v_model = gensim.downloader.load('word2vec-google-news-300')
@@ -154,18 +154,29 @@ if __name__ == '__main__':
     label_distances = np.zeros((len(labels), len(labels)), dtype=np.float32)
 
     # Distance based representative
-    for i, (label, embeddings) in enumerate(labels_embeddings.items()):
-        label_distance, _, indexs, _ = document_group_similarities(embeddings, embeddings)
-        print("==============")
-        print(SPEECH_CLASSES[int(label)])
-        print(label_distance)
-        label_distances[i, i] = label_distance
-        for j in range(top_count):
-            no_links = remove_links(label_posts[label][indexs[j].item()])
-            no_ats = remove_ats(no_links)
-            remove_repeating = remove_consecutive_phrases(no_ats.split())
-            remove_repeating = " ".join(remove_repeating)
-            print(f"{j+1}: {remove_repeating}")
+    # for i, (label, embeddings) in enumerate(labels_embeddings.items()):
+    #     label_distance, _, indexs, _ = document_group_similarities(embeddings, embeddings)
+    #     print("==============")
+    #     print(SPEECH_CLASSES[int(label)])
+    #     print(label_distance)
+    #     label_distances[i, i] = label_distance
+    #     for j in range(top_count):
+    #         no_links = remove_links(label_posts[label][indexs[j].item()])
+    #         no_ats = remove_ats(no_links)
+    #         remove_repeating = remove_consecutive_phrases(no_ats.split())
+    #         remove_repeating = " ".join(remove_repeating)
+    #         print(f"{j+1}: {remove_repeating}")
+
+
+    embedding_totals = list()
+    for label in labels:
+        combined = sum(labels_embeddings[label])
+        embedding_totals.append(combined)
+
+    print([SPEECH_CLASSES[int(label)] for label in labels])
+    #print(embedding_clusters)
+    similarty = pytorch_cos_sim(embedding_totals, embedding_totals)
+    print(similarty)
 
 #     for i in range(len(labels)):
 #         label_a = labels[i]
@@ -197,8 +208,8 @@ if __name__ == '__main__':
 # print([SPEECH_CLASSES[int(label)] for label in labels])
 # print(label_distances)
 #
-# with open("distances.csv", 'w') as f:
-#     writer = csv.writer(f)
-#     writer.writerow([SPEECH_CLASSES[int(label)] for label in labels])
-#     for i in range(label_distances.shape[0]):
-#         writer.writerow(label_distances[i, :])
+with open("distances.csv", 'w', newline='') as f:
+    writer = csv.writer(f)
+    writer.writerow([SPEECH_CLASSES[int(label)] for label in labels])
+    for i in range(similarty.shape[0]):
+        writer.writerow([value.item() for value in similarty[i, :]])
