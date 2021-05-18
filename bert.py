@@ -144,7 +144,7 @@ def load_model_and_tokenizer():
     return model, tokenizer
 
 
-def get_texts(tables, chosen_class, max_len=100000):
+def get_texts(tables, chosen_class, max_len=100000, added_sent=False):
     texts = []
     for t in tables:
         table_data = pd.read_csv("data/" + t)
@@ -152,13 +152,19 @@ def get_texts(tables, chosen_class, max_len=100000):
             id = row[1]["class"]
             text = row[1]["text"]
             if id == chosen_class:
-                if len(text) > 480: #max is 512
-                    texts.append((text[:480] + str(". This is " + SPEECH_CLASSES[chosen_class] + ".")))
-                else:
-                    if text[-1] != ".":
-                        texts.append((text + str(". This is " + SPEECH_CLASSES[chosen_class] + ".")))
+                if added_sent:
+                    if len(text) > 480: #max is 512
+                        texts.append((text[:480] + str(". This is " + SPEECH_CLASSES[chosen_class] + ".")))
                     else:
-                        texts.append((text + str(" This is " + SPEECH_CLASSES[chosen_class] + ".")))
+                        if text[-1] != ".":
+                            texts.append((text + str(". This is " + SPEECH_CLASSES[chosen_class] + ".")))
+                        else:
+                            texts.append((text + str(" This is " + SPEECH_CLASSES[chosen_class] + ".")))
+                else:
+                    if len(text) > 512:
+                        texts.append(text[:512])
+                    else:
+                        texts.append(text)
             if len(texts) >= max_len:
                 break
     print("number of texts:", len(texts))
@@ -182,10 +188,13 @@ def get_mean_and_sentence(model, tokenizer, texts):
     return embd_mean, texts[max_cos]
 
 
-def get_class_mean_and_sentence(model, tokenizer, texts, chosen_class):
+def get_class_mean_and_sentence(model, tokenizer, texts, chosen_class, only_class_word=False):
     embeddings = []
     for t in texts:
-        embd = bert_to_vec(t, model, tokenizer, SPEECH_CLASSES[chosen_class])
+        if only_class_word:
+            embd = bert_to_vec(t, model, tokenizer, SPEECH_CLASSES[chosen_class])
+        else:
+            embd = bert_to_vec(t, model, tokenizer)
         embeddings.append(embd)
 
     embd_mean = torch.mean(torch.stack(embeddings), dim=0)
@@ -217,7 +226,7 @@ def visualize_dendrogram():
 
     Z = linkage(dists, 'average')
     fig = plt.figure(figsize=(15, 8))
-    dn = dendrogram(Z, labels=labels, leaf_rotation=15)
+    dn = dendrogram(Z, labels=labels, leaf_rotation=25)
     plt.show()
 
 if __name__ == '__main__':
@@ -230,19 +239,19 @@ if __name__ == '__main__':
     # print(sentence)
     # print(class_mean)
 
-    # visualize_dendrogram()
+    visualize_dendrogram()
 
     # for c, s in zip(SPEECH_CLASSES, sent):
     #     print(c, s)
 
     # mean and sentences saved in bert_vectors.py
-    tables = ["32.csv"]
-    chosen_class = 17
-    model, tokenizer = load_model_and_tokenizer()
-    texts = get_texts(tables, chosen_class)
-    class_mean, sentence = get_class_mean_and_sentence(model, tokenizer, texts, chosen_class)
-    print(sentence)
-    print(class_mean)
+    # tables = ["jigsaw-toxic.csv"]
+    # chosen_class = 24
+    # model, tokenizer = load_model_and_tokenizer()
+    # texts = get_texts(tables, chosen_class, added_sent=True)
+    # class_mean, sentence = get_class_mean_and_sentence(model, tokenizer, texts, chosen_class, only_class_word=True)
+    # print(sentence)
+    # print(class_mean)
 
 
 
