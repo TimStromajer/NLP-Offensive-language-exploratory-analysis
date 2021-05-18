@@ -8,18 +8,29 @@ import tweepy as tw
 import os
 from speech_classes import SPEECH_CLASSES
 
+
+def remove_none_labels(path):
+    tab = pd.read_csv(path)
+    tab2 = tab[tab["class"] != 0]
+    tab2 = tab2[["class", "text"]]
+    tab2.to_csv(path)
+
 ##### 9
 # tab = pd.read_csv("data/9_uo.csv")
 # tab2 = tab.replace({'class': {0: 13, 2: 0}})    # 1 -> 1
 # tab2 = tab2[["class", "tweet"]]
 # tab2 = tab2.rename(columns={'tweet': 'text'})
 # tab2.to_csv("data/9.csv")
+# remove none class
+#remove_none_labels("data/9.csv")
+
 
 ##### 25
 # tab = pd.read_csv("data/25_uo.tsv", sep='\t')
 # tab2 = tab.replace({'task_2': {"NONE": 0, "OFFN": 1, "HATE": 13, "PRFN": 7}})
 # tab2 = tab2[["task_2", "text"]]
 # tab2.to_csv("data/25.csv")
+#remove_none_labels("data/25.csv")
 
 ##### 21
 # tabData = {'class':  [], 'text': []}
@@ -54,7 +65,7 @@ from speech_classes import SPEECH_CLASSES
 #
 # df = pd.DataFrame(tabData, columns=['class', 'text'])
 # df.to_csv("data/21.csv")
-
+# remove_none_labels("data/21.csv")
 
 ##### 26 - getting 900 tweets / 15 min = 3600 / hour; last: 848187434735194112
 # consumer_key= 'IQ82FYxYl0ujW6ulJROH2GGhk'
@@ -128,6 +139,7 @@ from speech_classes import SPEECH_CLASSES
 #     tab = tab.replace({decision_header: dict.fromkeys(negative, 0) |
 #                                         dict.fromkeys(positive, harassment_class) |
 #                                         dict.fromkeys(other, 21)})
+#     tab = tab[tab[decision_header] != 21]
 #     tab = tab[[decision_header, tweet_header]]
 #     tab = tab.rename(columns={tweet_header: 'text', decision_header: 'class'})
 #     tab = tab[tab['text'].notna()]
@@ -188,41 +200,41 @@ from speech_classes import SPEECH_CLASSES
 
 # Labels each class multiple times
 ### jigsaw_toxic
-source_path_train = os.path.join("data", "jigsaw-toxic_train_uo.csv")
-source_path_test = os.path.join("data", "jigsaw-toxic_test_uo.csv")
-classes = ["toxic", "severe_toxic", "obscene", "threat", "insult", "identity_hate"]
-class_ids = {c: SPEECH_CLASSES.index("unclassified offensive") if c not in SPEECH_CLASSES else SPEECH_CLASSES.index(c)
-             for c in classes}
-column_names = ['text']
-column_names.extend(classes)
-toxic_posts_train: pd.DataFrame = pd.read_csv(source_path_train, header=0, usecols=[1, 2, 3, 4, 5, 6, 7],
-                                              names=column_names, dtype=str)
-toxic_posts_test: pd.DataFrame = pd.read_csv(source_path_test, header=0, usecols=[1, 2, 3, 4, 5, 6, 7],
-                                             names=column_names, dtype=str)
-toxic_posts = pd.concat([toxic_posts_train, toxic_posts_test], ignore_index=True)
-print(toxic_posts)
-single_class_dataframes = list()
-for c in classes:
-    posts = toxic_posts[['text', c]]
-    posts = posts[posts[c] == '1']
-    posts['class'] = class_ids[c]
-    posts = posts[['class', 'text']]
-    single_class_dataframes.append(posts)
-
-total = pd.concat(single_class_dataframes, ignore_index=True)
-total.to_csv(os.path.join("data", "jigsaw-toxic-no-none.csv"))
-
-# Find posts with all labels set to 0 and add them as non-offensive
-clean_posts = toxic_posts.copy()
-for c in classes:
-    clean_posts = clean_posts[clean_posts[c] == '0']
-clean_posts = clean_posts[['text']]
-clean_posts['class'] = SPEECH_CLASSES.index('none')
-clean_posts = clean_posts[['class', 'text']]
-single_class_dataframes.append(clean_posts)
-
-total = pd.concat(single_class_dataframes, ignore_index=True)
-total.to_csv(os.path.join("data", "jigsaw-toxic.csv"))
+# source_path_train = os.path.join("data", "jigsaw-toxic_train_uo.csv")
+# source_path_test = os.path.join("data", "jigsaw-toxic_test_uo.csv")
+# classes = ["toxic", "severe_toxic", "obscene", "threat", "insult", "identity_hate"]
+# class_ids = {c: SPEECH_CLASSES.index("unclassified offensive") if c not in SPEECH_CLASSES else SPEECH_CLASSES.index(c)
+#              for c in classes}
+# column_names = ['text']
+# column_names.extend(classes)
+# toxic_posts_train: pd.DataFrame = pd.read_csv(source_path_train, header=0, usecols=[1, 2, 3, 4, 5, 6, 7],
+#                                               names=column_names, dtype=str)
+# toxic_posts_test: pd.DataFrame = pd.read_csv(source_path_test, header=0, usecols=[1, 2, 3, 4, 5, 6, 7],
+#                                              names=column_names, dtype=str)
+# toxic_posts = pd.concat([toxic_posts_train, toxic_posts_test], ignore_index=True)
+# print(toxic_posts)
+# single_class_dataframes = list()
+# for c in classes:
+#     posts = toxic_posts[['text', c]]
+#     posts = posts[posts[c] == '1']
+#     posts['class'] = class_ids[c]
+#     posts = posts[['class', 'text']]
+#     single_class_dataframes.append(posts)
+#
+# total = pd.concat(single_class_dataframes, ignore_index=True)
+# total.to_csv(os.path.join("data", "jigsaw-toxic.csv"))
+#
+# # Find posts with all labels set to 0 and add them as non-offensive
+# clean_posts = toxic_posts.copy()
+# for c in classes:
+#     clean_posts = clean_posts[clean_posts[c] == '0']
+# clean_posts = clean_posts[['text']]
+# clean_posts['class'] = SPEECH_CLASSES.index('none')
+# clean_posts = clean_posts[['class', 'text']]
+# single_class_dataframes.append(clean_posts)
+#
+# total = pd.concat(single_class_dataframes, ignore_index=True)
+# total.to_csv(os.path.join("data", "jigsaw-toxic-with-none.csv"))
 
 ### count unique jigsaw
 # source_path_train = os.path.join("data", "jigsaw-toxic_train_uo.csv")

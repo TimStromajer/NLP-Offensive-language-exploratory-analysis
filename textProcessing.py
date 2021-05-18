@@ -38,6 +38,12 @@ def remove_consecutive_phrases(tokens):
     return tokens
 
 
+def remove_consecutive_phrases_string(text):
+    words = text.split()
+    words = remove_consecutive_phrases(words)
+    return ' '.join(words)
+
+
 def tokenize(raw):
     text = raw.lower()
     # remove punctuation
