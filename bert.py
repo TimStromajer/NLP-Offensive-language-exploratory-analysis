@@ -7,17 +7,21 @@ import matplotlib.pyplot as plt
 from scipy.cluster.hierarchy import dendrogram, linkage
 import numpy as np
 
-from bert_vectors import mean, sent, mean2
+from bert_vectors import mean, sent, mean2, mean3
 from speech_classes import SPEECH_CLASSES
 
 
-def bert_to_vec(text, model, tokenizer):
-    # # text = "Here is the sentence I want embeddings for."
-    # marked_text = "[CLS] " + text + " [SEP]"
-    #
-    # # Tokenize our sentence with the BERT tokenizer.
-    # tokenized_text = tokenizer.tokenize(marked_text)
-    #
+def bert_to_vec(text, model, tokenizer, class_word=None):
+    if class_word is not None:
+        # text = "Here is the sentence I want embeddings for."
+        marked_text = "[CLS] " + text + " [SEP]"
+
+        # Tokenize our sentence with the BERT tokenizer.
+        tokenized_text = tokenizer.tokenize(marked_text)
+
+        # Tokenize class sentence with the BERT tokenizer.
+        tokenized_class = tokenizer.tokenize(class_word)
+
     # # Map the token strings to their vocabulary indeces.
     # indexed_tokens = tokenizer.convert_tokens_to_ids(tokenized_text)
     #
@@ -65,6 +69,11 @@ def bert_to_vec(text, model, tokenizer):
     #
     # print("Number of hidden units:", len(hidden_states[layer_i][batch_i][token_i]))
 
+    if class_word is not None:
+        tokens = len(hidden_states[0][0])
+        start = tokens - 2 - len(tokenized_class)
+        stop = -2
+
     # Concatenate the tensors for all layers. We use `stack` here to
     # create a new dimension in the tensor.
     token_embeddings = torch.stack(hidden_states, dim=0)
@@ -111,8 +120,12 @@ def bert_to_vec(text, model, tokenizer):
     # `token_vecs` is a tensor with shape [22 x 768]
     token_vecs = hidden_states[-2][0]
 
-    # Calculate the average of all 22 token vectors.
-    sentence_embedding = torch.mean(token_vecs, dim=0)
+    if class_word is None:
+        # Calculate the average of all token vectors.
+        sentence_embedding = torch.mean(token_vecs, dim=0)
+    else:
+        # Calculate the average of all class token vectors.
+        sentence_embedding = torch.mean(token_vecs[start:stop], dim=0)
 
     return sentence_embedding
 
@@ -169,6 +182,23 @@ def get_mean_and_sentence(model, tokenizer, texts):
     return embd_mean, texts[max_cos]
 
 
+def get_class_mean_and_sentence(model, tokenizer, texts, chosen_class):
+    embeddings = []
+    for t in texts:
+        embd = bert_to_vec(t, model, tokenizer, SPEECH_CLASSES[chosen_class])
+        embeddings.append(embd)
+
+    embd_mean = torch.mean(torch.stack(embeddings), dim=0)
+
+    cos_from_mean = []
+    for i, e in enumerate(embeddings):
+        cos = cosine_dist(e, embd_mean)
+        cos_from_mean.append(cos)
+    max_cos = cos_from_mean.index(max(cos_from_mean))
+
+    return embd_mean, texts[max_cos]
+
+
 def cosine_dist(vec1, vec2):
     return 1 - cosine(vec1, vec2)
 
@@ -176,8 +206,8 @@ def cosine_dist(vec1, vec2):
 def visualize_dendrogram():
     dists = []
     labels = []
-    for i, m1 in enumerate(mean):
-        for j, m2 in enumerate(mean):
+    for i, m1 in enumerate(mean3):
+        for j, m2 in enumerate(mean3):
             if j > i:
                 dist = cosine(m1, m2)
                 if dist > 0:
@@ -204,6 +234,15 @@ if __name__ == '__main__':
 
     # for c, s in zip(SPEECH_CLASSES, sent):
     #     print(c, s)
+
+    # mean and sentences saved in bert_vectors.py
+    tables = ["32.csv"]
+    chosen_class = 17
+    model, tokenizer = load_model_and_tokenizer()
+    texts = get_texts(tables, chosen_class)
+    class_mean, sentence = get_class_mean_and_sentence(model, tokenizer, texts, chosen_class)
+    print(sentence)
+    print(class_mean)
 
 
 
