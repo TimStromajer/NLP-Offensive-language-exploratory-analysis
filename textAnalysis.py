@@ -112,7 +112,7 @@ def k_means(matrix, k):
 
 if __name__ == '__main__':
     k = 6
-    tables = [f"{i}.csv" for i in [9, 21, 25, 26, 31, 32]]
+    tables = [f"{i}.csv" for i in [9, 21, 25, 26, 31, 32, 'jigsaw-toxic-no-none']]
     documents, classes = combine_texts(tables)
     tfidf, terms, stem_term_map = tf_idf(documents)
     dense = tfidf.todense()
@@ -143,7 +143,7 @@ if __name__ == '__main__':
     with open("clusters.txt", "w") as f:
         for i in range(k):
             f.write(f"Cluster {i}: {', '.join(cluster_classes[i])}\n")
-            for ind in order_centroids[i, :10]:
+            for ind in order_centroids[i, :20]:
                 output_term = [stem_term_map[term] for term in terms[ind].split()]
                 output_term = [max(term, key=term.get) for term in output_term]
                 f.write(f"\t{' '.join(output_term)}\n")
