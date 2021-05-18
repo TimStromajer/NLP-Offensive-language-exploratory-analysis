@@ -24,6 +24,9 @@ class:
 
 21 - unclassified offensive
 
+22 - toxic
+23 - severe toxic
+24 - identity hate
 files have two columns: class, text
 
 jigsaw_source = https://www.kaggle.com/c/jigsaw-toxic-comment-classification-challenge/data
