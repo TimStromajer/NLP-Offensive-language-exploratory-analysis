@@ -14,14 +14,14 @@ def plot_dense_embeddings(title, labels, embedding_clusters, filename=None):
     for label, embeddings, color in zip(labels, embedding_clusters, colors):
         x = embeddings[:, 0]
         y = embeddings[:, 1]
-        plt.scatter(x, y, c=color, alpha=0.7, label=label)
+        plt.scatter(x, y, c=color, alpha=0.7, label=label, s=200)
         plt.annotate(label.upper(), alpha=1.0, xy=(mean(x), mean(y)), xytext=(0, 0),
                      textcoords='offset points', ha='center', va='center', size=15)
-    plt.legend(loc=4)
+    # plt.legend(loc=4)
     plt.title(title)
     plt.grid(False)
     if filename:
-        plt.savefig(filename, format='png', dpi=150, bbox_inches='tight')
+        plt.savefig(f"{filename}.png", format='png', dpi=150, bbox_inches='tight')
     plt.show()
 
 
@@ -56,6 +56,7 @@ def plotPCA(title, labels, embedding_clusters, filename=None):
 
 
 def plotDistanceMatrix(title, labels, similarity_matrix, filename=None):
+    plt.figure(figsize=(9, 9))
     plt.title(title)
     plt.pcolor(similarity_matrix, cmap='plasma')
     plt.xticks([x + 0.5 for x in range(len(labels))], labels, rotation=90)
@@ -63,5 +64,5 @@ def plotDistanceMatrix(title, labels, similarity_matrix, filename=None):
     plt.colorbar(label="Cosine Similarity", orientation="vertical")
     plt.tight_layout()
     if filename:
-        plt.savefig(filename, format='png', dpi=150, bbox_inches='tight')
+        plt.savefig(f"{filename}.png", format='png', dpi=150, bbox_inches='tight')
     plt.show()
