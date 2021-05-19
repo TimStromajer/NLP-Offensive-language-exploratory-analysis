@@ -13,6 +13,7 @@ from speech_classes import SPEECH_CLASSES
 from torch import mean, argsort
 from sentence_transformers.util import pytorch_cos_sim
 from nltk.corpus import stopwords
+from scipy.optimize import linear_sum_assignment
 
 
 from sklearn.manifold import TSNE
@@ -24,22 +25,7 @@ import matplotlib.pyplot as plt
 import matplotlib.cm as cm
 from sentence_transformers.util import pytorch_cos_sim
 
-
-
-
 stopwords = stopwords.words('english')
-
-
-def cart2pol(x, y):
-    rho = np.sqrt(x**2 + y**2)
-    phi = np.arctan2(y, x)
-    return(rho, phi)
-
-
-def pol2cart(rho, phi):
-    x = rho * np.cos(phi)
-    y = rho * np.sin(phi)
-    return(x, y)
 
 
 def read_document(file_path):
@@ -147,13 +133,6 @@ def plotPCA(title, embedding_clusters, filename = None):
     model_en_2d = PCA(n_components=2, random_state = 32)
     model_en_2d = model_en_2d.fit_transform(embedding_clusters.reshape(n * m, k))
     embeddings_en_2d = np.array(model_en_2d).reshape(n, m, 2)
-    embeddings_en_2d = [cart2pol(v[0][0], v[0][1]) for v in embeddings_en_2d.tolist()]
-    max_phi = max(embeddings_en_2d, key=lambda x: x[1])[1]
-    min_phi = min(embeddings_en_2d, key=lambda x: x[1])[1]
-    print(max_phi)
-    print(min_phi)
-    embeddings_en_2d = [[pol2cart(r, p)] for r, p in embeddings_en_2d]
-    embeddings_en_2d = np.array(embeddings_en_2d)
     plot_similar_words(title, [SPEECH_CLASSES[int(label)] for label in labels], embeddings_en_2d, filename)
 
 
@@ -248,8 +227,10 @@ if __name__ == '__main__':
 
     #Centroid based similarity
     similarity = pytorch_cos_sim(embedding_totals, embedding_totals)
+    similarity = similarity.numpy()
     print([SPEECH_CLASSES[int(label)] for label in labels])
-    print(similarity)
+    #print(similarity)
+
 
 
     plotMDS("Totals", [[tot] for tot in embedding_totals])
@@ -257,6 +238,12 @@ if __name__ == '__main__':
     # plotTSNE("Title", embedding_top_similar, perplexity=10)
     # plotPCA("Title", embedding_top_similar)
 
+    plt.pcolor(similarity)
+    plt.xticks([x + 0.5 for x in range(len(labels))], [SPEECH_CLASSES[int(label)] for label in labels], rotation=45, ha="right")
+    plt.yticks([y + 0.5 for y in range(len(labels))], [SPEECH_CLASSES[int(label)] for label in labels])
+    plt.colorbar(label="Cosine Similarity", orientation="vertical")
+    plt.tight_layout()
+    plt.show()
 
     # Save similarities to file
     # with open("distances.csv", 'w', newline='') as f:
