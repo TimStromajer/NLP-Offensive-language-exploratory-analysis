@@ -64,6 +64,8 @@ def load_or_create(path, action, recreate=False):
     return output
 
 
+# Calculate distances between two groups of embeddings (lists or arrays of embeddings)
+# Returns the distance plus indexes of the closest from a to b and closest from b to a
 def document_group_similarities(a_embeddings, b_embeddings):
     distances = pytorch_cos_sim(a_embeddings, b_embeddings)
     a_to_b_averages = torch.mean(distances, dim=1)
@@ -99,6 +101,7 @@ if __name__ == '__main__':
                    'jigsaw-toxic.csv'
                    ]
 
+    # Load the data into these variables
     all_posts = list()
     all_labels = list()
     all_embeddings = list()
@@ -118,6 +121,7 @@ if __name__ == '__main__':
         all_embeddings.extend(post_embeddings)
         print(len(post_embeddings))
 
+    # Move data into dictionaries {label: list of embeddings}, {label: list of texts}
     labels_embeddings = dict()
     label_posts = dict()
     for i in range(len(all_labels)):
@@ -135,7 +139,8 @@ if __name__ == '__main__':
     top_count_print = 5
     top_count_visualize = 30
 
-    # Centroid based representative
+    # Combined based representative posts
+    # Finds posts closest to the combined vector of the class
     embedding_totals = list()
     embedding_top_similar = list()
     posts_top_similar = list()
@@ -166,7 +171,7 @@ if __name__ == '__main__':
         embedding_top_similar.append(label_embedding_top)
         posts_top_similar.append(label_post_top)
 
-    #Centroid based similarity
+    # Similarity of the combined embeddings of each label
     similarity = pytorch_cos_sim(embedding_totals, embedding_totals)
     similarity = similarity.numpy()
 
@@ -178,7 +183,8 @@ if __name__ == '__main__':
 
     plotDistanceMatrix("Document Similarity", labels, similarity)
 
-    #Distance based representative
+    # Distance based representative
+    # Finds the posts closest based on the lowest distance to all posts withn the class
     for i, (label, embeddings) in enumerate(labels_embeddings.items()):
         label_distance, _, indexs, _ = document_group_similarities(embeddings, embeddings)
         print("==============")
