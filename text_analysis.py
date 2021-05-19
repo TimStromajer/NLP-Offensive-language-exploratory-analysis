@@ -126,7 +126,7 @@ def get_keywords(data):
         print(f"Loaded keywords from disk")
     except FileNotFoundError:
         print("Calculating keywords...")
-        docs = defaultdict(list)
+        docs_by_class = defaultdict(list)
         for table in data:
             table_data = pd.read_csv("data/" + table)
             for row in table_data.iterrows():
@@ -137,25 +137,33 @@ def get_keywords(data):
                 text = remove_retweets(text)
                 text = remove_consecutive_phrases(text.split())
                 text = " ".join(text)
-                docs[id].append(text)
+                docs_by_class[id].append(text)
+
+        docs_joined = []
+        class_sizes = []
+        for class_name, value in sorted(docs_by_class.items(), key=lambda x: x[0]):
+            docs_joined += value
+            class_sizes.append(len(value))
 
         stop_words = tokenize_and_stem_stopwords(set(stopwords.words("english")))
         keywords = []
         stem_term_map = dict()
-        for speech_class in docs.keys():
-            vect = TfidfVectorizer(
-                stop_words=stop_words,
-                max_df=0.85,
-                tokenizer=lambda x: tokenize_and_stem_map_terms(x, stem_term_map),
-            )
-            tfidf = vect.fit_transform(docs[speech_class])
-            mean = tfidf.mean(0)  # mean of each column - average tfidf of each term from the vocabulary
-            words = vect.get_feature_names()
+        vect = TfidfVectorizer(
+            stop_words=stop_words,
+            max_df=0.85,
+            tokenizer=lambda x: tokenize_and_stem_map_terms(x, stem_term_map),
+        )
+        tfidf = vect.fit_transform(docs_joined)
+        mean = tfidf.mean(0)  # mean of each column - average tfidf of each term from the vocabulary
+        words = vect.get_feature_names()
 
-            word_frequencies = []
-            for i in range(mean.shape[1]):
-                word_frequencies.append((words[i], mean[0, i]))
-            keywords.append(list(sorted(word_frequencies, key=lambda item: item[1], reverse=True)))
+        word_frequencies = []
+        for i in range(mean.shape[1]):
+            word_frequencies.append((words[i], mean[0, i]))
+
+        index = 0
+        for size in class_sizes:
+            keywords.append(list(sorted(word_frequencies[index:index + size], key=lambda item: item[1], reverse=True)))
 
         all_full_terms = list()
         for l_keywords in keywords:
