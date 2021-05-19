@@ -122,7 +122,7 @@ def get_keywords(data):
     if not os.path.exists("model_pickles"):
         os.makedirs("model_pickles")
     try:
-        keywords = joblib.load(filename)
+        all_full_terms = joblib.load(filename)
         print(f"Loaded keywords from disk")
     except FileNotFoundError:
         print("Calculating keywords...")
@@ -141,11 +141,12 @@ def get_keywords(data):
 
         stop_words = tokenize_and_stem_stopwords(set(stopwords.words("english")))
         keywords = []
+        stem_term_map = dict()
         for speech_class in docs.keys():
             vect = TfidfVectorizer(
                 stop_words=stop_words,
                 max_df=0.85,
-                tokenizer=tokenize_and_stem,
+                tokenizer=lambda x: tokenize_and_stem_map_terms(x, stem_term_map),
             )
             tfidf = vect.fit_transform(docs[speech_class])
             mean = tfidf.mean(0)  # mean of each column - average tfidf of each term from the vocabulary
@@ -155,9 +156,18 @@ def get_keywords(data):
             for i in range(mean.shape[1]):
                 word_frequencies.append((words[i], mean[0, i]))
             keywords.append(list(sorted(word_frequencies, key=lambda item: item[1], reverse=True)))
-        joblib.dump(keywords, filename)
+
+        all_full_terms = list()
+        for l_keywords in keywords:
+            label_full_terms = list()
+            for keyword in l_keywords:
+                full_term = stem_term_map[keyword[0]]
+                label_full_terms.append(full_term)
+            all_full_terms.append(label_full_terms)
+
+        joblib.dump(all_full_terms, filename)
     finally:
-        return keywords
+        return all_full_terms
 
 
 def main():
@@ -165,6 +175,7 @@ def main():
     tables = [f"{i}.csv" for i in [9, 21, 25, 26, 31, 32, 'jigsaw-toxic']]
     documents, classes = combine_texts(tables)
     keywords = get_keywords(tables)
+    print([k[:3] for k in keywords])
     tfidf, terms, stem_term_map = tf_idf(documents)
 
     km = k_means(tfidf, k)
