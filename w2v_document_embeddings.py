@@ -129,13 +129,20 @@ if __name__ == '__main__':
         labels_embeddings[label].append(np.array(all_embeddings[i]))
         label_posts[label].append(all_posts[i])
 
-    print([SPEECH_CLASSES[int(label)] for label in label_posts.keys()])
+    labels = list(labels_embeddings.keys())
+    print([SPEECH_CLASSES[int(label)] for label in labels])
 
-    top_count = 5
+    top_count_print = 5
+    top_count_visualize = 100
 
     # Centroid based representative
+    embedding_totals = list()
+    embedding_top_similar = list()
+    posts_top_similar = list()
+
     for label in labels_embeddings:
         combined = sum(labels_embeddings[label])
+        embedding_totals.append(combined)
         count = len(labels_embeddings[label])
         centroid = combined/count
         distances = distance.cdist([centroid], labels_embeddings[label], "cosine")[0]
@@ -143,40 +150,50 @@ if __name__ == '__main__':
         sort = [i[0] for i in sorted(enumerate(distances), key=lambda x:x[1])]
         print("==============")
         print(SPEECH_CLASSES[int(label)])
-        for i in range(top_count):
+        for i in range(top_count_print):
             no_links = remove_links(label_posts[label][sort[i]])
             no_ats = remove_ats(no_links)
             remove_repeating = remove_consecutive_phrases(no_ats.split())
             remove_repeating = " ".join(remove_repeating)
             print(f"{i+1}: {remove_repeating}")
 
-    labels = list(labels_embeddings.keys())
-    label_distances = np.zeros((len(labels), len(labels)), dtype=np.float32)
+        label_embedding_top = list()
+        label_post_top = list()
+        for i in range(top_count_visualize):
+            label_embedding_top.append(labels_embeddings[label][sort[i]])
+            label_post_top.append(label_posts[label][sort[i]])
 
-    # Distance based representative
+    #Centroid based similarity
+    similarity = pytorch_cos_sim(embedding_totals, embedding_totals)
+    print([SPEECH_CLASSES[int(label)] for label in labels])
+    print(similarity)
+
+    
+
+    # Save similarities to file
+    # with open("distances.csv", 'w', newline='') as f:
+    #     writer = csv.writer(f)
+    #     writer.writerow([SPEECH_CLASSES[int(label)] for label in labels])
+    #     for i in range(similarty.shape[0]):
+    #         writer.writerow([value.item() for value in similarty[i, :]])
+
+
+    # label_distances = np.zeros((len(labels), len(labels)), dtype=np.float32)
+    #
+    # #Distance based representative
     # for i, (label, embeddings) in enumerate(labels_embeddings.items()):
     #     label_distance, _, indexs, _ = document_group_similarities(embeddings, embeddings)
     #     print("==============")
     #     print(SPEECH_CLASSES[int(label)])
     #     print(label_distance)
     #     label_distances[i, i] = label_distance
-    #     for j in range(top_count):
+    #     for j in range(top_count_print):
     #         no_links = remove_links(label_posts[label][indexs[j].item()])
     #         no_ats = remove_ats(no_links)
     #         remove_repeating = remove_consecutive_phrases(no_ats.split())
     #         remove_repeating = " ".join(remove_repeating)
     #         print(f"{j+1}: {remove_repeating}")
 
-
-    embedding_totals = list()
-    for label in labels:
-        combined = sum(labels_embeddings[label])
-        embedding_totals.append(combined)
-
-    print([SPEECH_CLASSES[int(label)] for label in labels])
-    #print(embedding_clusters)
-    similarty = pytorch_cos_sim(embedding_totals, embedding_totals)
-    print(similarty)
 
 #     for i in range(len(labels)):
 #         label_a = labels[i]
@@ -208,8 +225,4 @@ if __name__ == '__main__':
 # print([SPEECH_CLASSES[int(label)] for label in labels])
 # print(label_distances)
 #
-with open("distances.csv", 'w', newline='') as f:
-    writer = csv.writer(f)
-    writer.writerow([SPEECH_CLASSES[int(label)] for label in labels])
-    for i in range(similarty.shape[0]):
-        writer.writerow([value.item() for value in similarty[i, :]])
+
