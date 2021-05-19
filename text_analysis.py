@@ -177,9 +177,7 @@ def get_keywords(data):
 def main():
     k = 6
     tables = [f"{i}.csv" for i in [9, 21, 25, 26, 31, 32, 'jigsaw-toxic']]
-
     documents, classes = combine_texts(tables)
-
     tfidf, terms, stem_term_map = tf_idf(documents)
 
     km = k_means(tfidf, k)
