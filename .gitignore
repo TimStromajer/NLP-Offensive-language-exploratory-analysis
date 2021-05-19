@@ -1,7 +1,12 @@
+#Fast-text
+cc.en.300.bin
+cc.en.300.bin.gz
+
 #Pickled data
 data_pickles/
 model_pickles/
 w2v_document_embeddings.py-intermediate_data/
+w2v_term_analysis/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

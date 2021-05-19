@@ -5,12 +5,12 @@ import os
 import pickle
 import numpy as np
 import csv
+import torch
 
 from lazy_load import lazy
 from scipy.spatial import distance
 from text_processing import tokenize, remove_links, remove_ats, remove_consecutive_phrases
 from speech_classes import SPEECH_CLASSES
-from torch import mean, argsort
 from sentence_transformers.util import pytorch_cos_sim
 from nltk.corpus import stopwords
 from scipy.optimize import linear_sum_assignment
@@ -77,15 +77,15 @@ def load_or_create(path, action, recreate=False):
 
 def document_group_similarities(a_embeddings, b_embeddings):
     distances = pytorch_cos_sim(a_embeddings, b_embeddings)
-    a_to_b_averages = mean(distances, dim=1)
+    a_to_b_averages = torch.mean(distances, dim=1)
     # print("Correct dimension:", len(a_embeddings) == len(a_to_b_averages))
-    b_to_a_averages = mean(distances, dim=0)
-    top_a_to_b = argsort(a_to_b_averages, descending=True)
-    top_b_to_a = argsort(b_to_a_averages, descending=True)
+    b_to_a_averages = torch.mean(distances, dim=0)
+    top_a_to_b = torch.argsort(a_to_b_averages, descending=True)
+    top_b_to_a = torch.argsort(b_to_a_averages, descending=True)
     # print([a_to_b_averages[i.item()] for i in top_a_to_b[:5]])
     # print([b_to_a_averages[i.item()] for i in top_b_to_a[:5]])
-    a_to_b = mean(a_to_b_averages)
-    b_to_a = mean(b_to_a_averages)
+    a_to_b = torch.mean(a_to_b_averages)
+    b_to_a = torch.mean(b_to_a_averages)
     return a_to_b, b_to_a, top_a_to_b, top_b_to_a
 
 
@@ -253,21 +253,21 @@ if __name__ == '__main__':
     #         writer.writerow([value.item() for value in similarty[i, :]])
 
 
-    # label_distances = np.zeros((len(labels), len(labels)), dtype=np.float32)
-    #
-    # #Distance based representative
-    # for i, (label, embeddings) in enumerate(labels_embeddings.items()):
-    #     label_distance, _, indexs, _ = document_group_similarities(embeddings, embeddings)
-    #     print("==============")
-    #     print(SPEECH_CLASSES[int(label)])
-    #     print(label_distance)
-    #     label_distances[i, i] = label_distance
-    #     for j in range(top_count_print):
-    #         no_links = remove_links(label_posts[label][indexs[j].item()])
-    #         no_ats = remove_ats(no_links)
-    #         remove_repeating = remove_consecutive_phrases(no_ats.split())
-    #         remove_repeating = " ".join(remove_repeating)
-    #         print(f"{j+1}: {remove_repeating}")
+    label_distances = np.zeros((len(labels), len(labels)), dtype=np.float32)
+
+    #Distance based representative
+    for i, (label, embeddings) in enumerate(labels_embeddings.items()):
+        label_distance, _, indexs, _ = document_group_similarities(embeddings, embeddings)
+        print("==============")
+        print(SPEECH_CLASSES[int(label)])
+        print(label_distance)
+        label_distances[i, i] = label_distance
+        for j in range(top_count_print):
+            no_links = remove_links(label_posts[label][indexs[j].item()])
+            no_ats = remove_ats(no_links)
+            remove_repeating = remove_consecutive_phrases(no_ats.split())
+            remove_repeating = " ".join(remove_repeating)
+            print(f"{j+1}: {remove_repeating}")
 
 
 #     for i in range(len(labels)):

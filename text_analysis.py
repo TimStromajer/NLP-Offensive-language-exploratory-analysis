@@ -163,7 +163,15 @@ def get_keywords(data):
             keywords = list(sorted(keywords, key=lambda item: item[1], reverse=True))
             all_keywords.append(keywords)
 
-        return all_keywords
+        all_full_terms = list()
+        for keywords in all_keywords:
+            label_full_terms = list()
+            for keyword in keywords:
+                full_term = stem_term_map[keyword[0]]
+                label_full_terms.append(full_term)
+            all_full_terms.append(label_full_terms)
+
+        return all_full_terms
 
 
 def main():
@@ -172,6 +180,12 @@ def main():
 
     documents, classes = combine_texts(tables)
     keywords = get_keywords(documents)
+    keywords_dict = {SPEECH_CLASSES[classes[i]]: keywords[i] for i in range(len(keywords))}
+    keywords_dir = "w2v_term_analysis"
+    if not os.path.exists(keywords_dir):
+        os.mkdir(keywords_dir)
+    joblib.dump(keywords_dict, os.path.join(keywords_dir, "keywords.p"))
+
     tfidf, terms, stem_term_map = tf_idf(documents)
 
     km = k_means(tfidf, k)

@@ -11,7 +11,7 @@ porter = PorterStemmer()
 
 
 def remove_links(text):
-    url_link_regex = r'https?:\/\/[^\s]*'
+    url_link_regex = r'(www[^\s]*)|(https?:\/\/[^\s]*)'
     return re.sub(url_link_regex, '', text)
 
 

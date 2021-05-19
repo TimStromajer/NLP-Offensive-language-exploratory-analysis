@@ -1,40 +1,24 @@
 Cluster 0: obscene, threat, insult, toxic, severe_toxic, identity_hate
-	['wikipedia', 'vandalism', 'revert', 'wiki', 'ip', 'homosexual', 'editors', 'unblock', 'billcj', 'wp', 'utc', 'encyclopedia', 'vandalising', 'cking', 'anti-semite', 'wikipedians', 'undo', 'sockpuppet', 'rvv', 'anus']
+	['wikipedia', 'vandalism', 'revert', 'talk', 'page', 'wiki', 'ip', 'editors', 'homosexual', 'this', 'article', 'person', 'attack', 'this', 'page', 'wp', 'unblock', 'eat', 'shit', 'utc', 'fuck', 'wikipedia', 'suck', 'cock', 'billcj', 'encyclopedia', 'this', 'site']
 
 
-Cluster 1: offensive, abusive, racist
-	['hillbilly', 'niggah', 'beaner', 'wrestlemania', 'bird', 'sequel', 'terrifying', 'april', 'rn', 'spic', 'maga', 'hella', 'syria', 'surrender', 'nig', 'retweet', 'nigguh', 'bae', 'booty', 'aye']
+Cluster 1: cyberbullying
+	['riot', 'op', 'forum', 'this', 'game', 'ip', 'hacker', 'gd', 'sexual', 'harassment', 'got', 'ban', 'it.', 'pretty', 'much', 'boost', 'teammates', 'increase', 'white', 'knight', 'silver', 'stacks', 'this', 'individual', 'me.', "'ve", 'play']
 
 
-Cluster 2: profane, hateful
-	['cricket', 'impeachtrump', 'boris', 'gloves', 'impeachment', 'dhoni', 'maga', 'congress', 'bengal', 'oral', 'coon', 'tory', 'brexit', 'tournament', 'trump2020', 'notmypresident', 'democracy', 'theresistance', 'mp', 'nig']
+Cluster 2: racist, homophobic, sexist, religion
+	['call', 'faggot', 'gt', 'gt', 'surrender', 'muzzie', 'nigga', 'nigga', 'faggot', 'faggot', 'hillbilly', 'gallery', 'say', 'faggot', 'islamist', 'call', 'nigger', 'nigga', 'this', 'gt', 'gt', 'gt', 'maga', 'like', 'dyke', 'nigger', 'nigga', 'happy', 'birthday', 'feminazi', 'sjw', 'victim', 'card']
 
 
-Cluster 3: political
-	['fuckbag', 'dickwad', 'clinton', 'notmypresident', 'ruski', 'cheeto', 'deplorable', 'hrc', 'snowflake', 'cia', 'ned', 'cnn', 'donnie', 'asswipe', 'nomination', 'manufacturing', 'jan', 'ass-hat', 'duchebag', 'sleaze']
+Cluster 3: offensive, abusive, appearance-related
+	['bad', 'bitch', 'niggah', 'assface', 'fatass', 'eat', 'gym', 'bitch', "'m", 'dickface', 'fugly', 'bitch', 'bitch', 'bad', 'ass', 'yo', 'bitch', 'dm', 'wrestlemania', 'nasty', 'ass', 'bird', 'rn', 'gt', 'gt', 'this', 'idiot', 'lt', 'lt', 'grandpa']
 
 
-Cluster 4: cyberbullying
-	['riot', 'op', 'forum', 'ip', 'hacker', 'gd', 'it.', 'teammates', 'boost', 'increase', 'silver', 'stacks', 'me.', 'mana', 'summon', 'feedback', 'diamond', 'range', 'dunk', 'queue']
+Cluster 4: profane, hateful
+	['world', 'cup', 'cricket', 'impeachtrump', 'boris', 'gloves', 'impeachment', 'dhoni', 'maga', 'bengal', 'congress', 'oral', 'coon', 'tory', 'brexit', 'tournament', 'democracy', 'notmypresident', 'nig', 'trump2020', 'happy', 'birthday']
 
 
-Cluster 5: religion
-	['muzzie', 'surrender', 'islamist', 'spring', 'maga', 'graham', 'gabrielle', 'jihad', 'syria', 'gaza', 'appease', 'mosque', 'yummy', 'fanatic', 'whoa', 'instant', 'sigh', 'invasion', 'radical', 'raghead']
-
-
-Cluster 6: intellectual
-	['tard', 'asswipe', 'cockhead', 'ass-hat', 'dickface', 'fuckwit', 'shitface', 'shat', 'pickup', 'steroid', 'lmaooo', 'dickwad', 'dumbfuck', 'eve', 'identity', 'romo', 'dense', 'uninformed', 'ceo', 'fave']
-
-
-Cluster 7: sexist
-	['gallery', 'feminazi', 'ssy', 'latina', 'angelina', 'teasing', 'valentine', 'blonde', 'alexis', 'tory', 'lisa', 'sjw', 'juicy', 'vid', 'dicksucking', 'gorgeous', 'pornstar', 'benz', 'trimmed', 'eva']
-
-
-Cluster 8: appearance-related
-	['assface', 'dickface', 'fugly', 'gym', 'shitface', 'grandpa', 'dm', 'rn', 'taco', 'pumpkin', 'cuntface', 'salad', 'snack', 'von', 'merry', 'plate', 'santa', 'unfollow', 'cream', 'autocorrect']
-
-
-Cluster 9: homophobic
-	['eminem', 'strap', 'alpha', 'retweet', 'humiliation', 'fuckhole', 'sjw', 'sale', 'str8', 'vid', 'radiates', 'outfit', 'gf', 'worship', 'jacket', 'halloween', 'bdsm', 'haircut', 'beta', 'rn']
+Cluster 5: intellectual, political
+	['fuckbag', 'dickwad', 'tard', 'asswipe', 'u', 'dumb', 'fuck', 'u', 'dumb', 'cockhead', 'fuck', 'dumb', 'fuck', 'ass-hat', 'fuck', 'dumb', 'dickface', 'dumb', 'fuck', 'this', 'fuck', 'tard', 'clinton', 'get', 'head', 'dumb', 'fuck', 'fuck', 'one', 'dumb', 'notmypresident', 'ruski', 'trump', 'support']
 
 
