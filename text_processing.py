@@ -2,6 +2,7 @@ import re
 
 import nltk
 import pandas as pd
+from nltk.corpus import stopwords
 from nltk.stem import SnowballStemmer, PorterStemmer
 import string
 
@@ -20,6 +21,14 @@ def remove_ats(text):
 
 def remove_consecutive_words(text):
     return re.sub(r'\b(\w+\s*)\1+', '\\1', text)
+
+
+def remove_retweets(text):
+    return re.sub(r'(\brt\b)*', r'', text, flags=re.IGNORECASE)
+
+
+def to_ascii(text):
+    return text
 
 
 def remove_consecutive_phrases(tokens):
@@ -56,6 +65,16 @@ def tokenize(raw):
 def stemming(tokens):
     stems = [(token, stemmer.stem(token)) for token in tokens]
     return stems
+
+
+def tokenize_and_stem_stopwords(stopwords):
+    stopwords_processed = set()
+    for stop_word in stopwords:
+        sw_tokens = tokenize_and_stem(stop_word)
+        for token in sw_tokens:
+            stopwords_processed.add(token)
+
+    return stopwords_processed
 
 
 def tokenize_and_stem(text):
