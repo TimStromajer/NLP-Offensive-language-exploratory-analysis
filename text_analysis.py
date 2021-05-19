@@ -1,15 +1,18 @@
 import os
 import pickle
+from collections import defaultdict
 
+import numpy as np
 import pandas as pd
 import joblib
 import matplotlib.pyplot as plt
-from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.feature_extraction.text import TfidfVectorizer, CountVectorizer
 from sklearn.cluster import KMeans
 from sklearn.decomposition import PCA
 from nltk.corpus import stopwords
 
-from textProcessing import tokenize_and_stem, vocabulary_frame, tokenize_and_stem_map_terms, remove_ats, remove_links, remove_consecutive_phrases
+from text_processing import tokenize_and_stem, vocabulary_frame, tokenize_and_stem_map_terms, remove_ats, remove_links, \
+    remove_consecutive_phrases, tokenize_and_stem_stopwords, remove_retweets, to_ascii
 from speech_classes import SPEECH_CLASSES
 
 
@@ -38,6 +41,7 @@ def combine_texts(tabs):
             text = row[1]["text"]
             text = remove_links(text)
             text = remove_ats(text)
+            text = remove_retweets(text)
             text = remove_consecutive_phrases(text.split())
             text = " ".join(text)
             speech_classes[id] += text + " "
@@ -76,9 +80,9 @@ def tf_idf(texts):
     except FileNotFoundError:
         stem_term_map = dict()
         tokenizer_function = lambda t: tokenize_and_stem_map_terms(t, stem_term_map)
+        stop_words = tokenize_and_stem_stopwords(set(stopwords.words("english")))
         vect = TfidfVectorizer(
-            max_features=200000,
-            stop_words=set(stopwords.words("english")),
+            stop_words=stop_words,
             max_df=0.5,
             min_df=5,
             use_idf=True,
@@ -114,23 +118,58 @@ def k_means(matrix, k):
         return km
 
 
-if __name__ == '__main__':
-    k = 8
+def get_keywords(data):
+    filename = f"model_pickles/keywords.p"
+    if not os.path.exists("model_pickles"):
+        os.makedirs("model_pickles")
+    try:
+        keywords = joblib.load(filename)
+        print(f"Loaded keywords from disk")
+    except FileNotFoundError:
+        print("Calculating keywords...")
+        docs = defaultdict(list)
+        for table in data:
+            table_data = pd.read_csv("data/" + table)
+            for row in table_data.iterrows():
+                id = row[1]["class"]
+                text = row[1]["text"]
+                text = remove_links(text)
+                text = remove_ats(text)
+                text = remove_retweets(text)
+                text = remove_consecutive_phrases(text.split())
+                text = " ".join(text)
+                docs[id].append(text)
+
+        stop_words = tokenize_and_stem_stopwords(set(stopwords.words("english")))
+        keywords = {key: dict() for key in docs.keys()}
+        for speech_class in docs.keys():
+            cv = CountVectorizer(
+                stop_words=stop_words,
+                max_df=0.85,
+                tokenizer=tokenize_and_stem,
+            )
+            cv.fit_transform(docs[speech_class])
+            vocab = cv.vocabulary_
+            for word in vocab.keys():
+                if word in keywords[speech_class]:
+                    keywords[speech_class][word] += vocab[word]
+                else:
+                    keywords[speech_class][word] = vocab[word]
+
+        for speech_class in docs.keys():
+            keywords[speech_class] = {k: v for k, v in sorted(keywords[speech_class].items(), key=lambda item: -item[1])}
+        joblib.dump(keywords, filename)
+    finally:
+        return keywords
+
+
+def main():
+    k = 6
     tables = [f"{i}.csv" for i in [9, 21, 25, 26, 31, 32, 'jigsaw-toxic']]
+    keywords = get_keywords(tables)
+
     documents, classes = combine_texts(tables)
     tfidf, terms, stem_term_map = tf_idf(documents)
-    dense = tfidf.todense()
-    denselist = dense.tolist()
-
-    all_keywords = []
-    for description in denselist:
-        x = 0
-        keywords = []
-        for word in description:
-            if word > 0:
-                keywords.append(terms[x])
-            x += 1
-        all_keywords.append(keywords)
 
     km = k_means(tfidf, k)
     kmean_indices = km.fit_predict(tfidf)
@@ -175,3 +214,5 @@ if __name__ == '__main__':
     print("")
 
 
+if __name__ == '__main__':
+    main()

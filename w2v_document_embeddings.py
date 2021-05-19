@@ -8,7 +8,7 @@ import csv
 
 from lazy_load import lazy
 from scipy.spatial import distance
-from textProcessing import tokenize, remove_links, remove_ats, remove_consecutive_phrases
+from text_processing import tokenize, remove_links, remove_ats, remove_consecutive_phrases
 from speech_classes import SPEECH_CLASSES
 from torch import mean, argsort
 from sentence_transformers.util import pytorch_cos_sim
