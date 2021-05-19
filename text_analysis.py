@@ -179,12 +179,6 @@ def main():
     tables = [f"{i}.csv" for i in [9, 21, 25, 26, 31, 32, 'jigsaw-toxic']]
 
     documents, classes = combine_texts(tables)
-    keywords = get_keywords(documents)
-    keywords_dict = {SPEECH_CLASSES[classes[i]]: keywords[i] for i in range(len(keywords))}
-    keywords_dir = "w2v_term_analysis"
-    if not os.path.exists(keywords_dir):
-        os.mkdir(keywords_dir)
-    joblib.dump(keywords_dict, os.path.join(keywords_dir, "keywords.p"))
 
     tfidf, terms, stem_term_map = tf_idf(documents)
 

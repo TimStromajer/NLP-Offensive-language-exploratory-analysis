@@ -4,16 +4,13 @@ import pandas as pd
 import os
 import pickle
 import numpy as np
-import csv
 import torch
 
 from lazy_load import lazy
 from scipy.spatial import distance
 from text_processing import tokenize, remove_links, remove_ats, remove_consecutive_phrases
 from speech_classes import SPEECH_CLASSES
-from sentence_transformers.util import pytorch_cos_sim
 from nltk.corpus import stopwords
-from scipy.optimize import linear_sum_assignment
 
 
 from sklearn.manifold import TSNE
@@ -245,14 +242,6 @@ if __name__ == '__main__':
     plt.tight_layout()
     plt.show()
 
-    # Save similarities to file
-    # with open("distances.csv", 'w', newline='') as f:
-    #     writer = csv.writer(f)
-    #     writer.writerow([SPEECH_CLASSES[int(label)] for label in labels])
-    #     for i in range(similarty.shape[0]):
-    #         writer.writerow([value.item() for value in similarty[i, :]])
-
-
     label_distances = np.zeros((len(labels), len(labels)), dtype=np.float32)
 
     #Distance based representative
@@ -268,36 +257,3 @@ if __name__ == '__main__':
             remove_repeating = remove_consecutive_phrases(no_ats.split())
             remove_repeating = " ".join(remove_repeating)
             print(f"{j+1}: {remove_repeating}")
-
-
-#     for i in range(len(labels)):
-#         label_a = labels[i]
-#         for j in range(i, len(labels)):
-#             label_b = labels[j]
-#             a_b_distance, b_a_distance, top_a_b, top_b_a = document_group_similarities(labels_embeddings[label_a], labels_embeddings[label_b])
-#             print()
-#             print()
-#             print("==============")
-#             print(a_b_distance)
-#             print(f"{SPEECH_CLASSES[int(label_a)]} closest to {SPEECH_CLASSES[int(label_b)]}")
-#             label_distances[i, j] = a_b_distance
-#             label_distances[j, i] = a_b_distance
-#             for k in range(top_count):
-#                 no_links = remove_links(label_posts[label_a][top_a_b[k].item()])
-#                 no_ats = remove_ats(no_links)
-#                 remove_repeating = remove_consecutive_phrases(no_ats.split())
-#                 remove_repeating = " ".join(remove_repeating)
-#                 print(f"{k+1}: {remove_repeating}")
-#             print()
-#             print(f"{SPEECH_CLASSES[int(label_b)]} closest to {SPEECH_CLASSES[int(label_a)]}")
-#             for k in range(top_count):
-#                 no_links = remove_links(label_posts[label_b][top_b_a[k].item()])
-#                 no_ats = remove_ats(no_links)
-#                 remove_repeating = remove_consecutive_phrases(no_ats.split())
-#                 remove_repeating = " ".join(remove_repeating)
-#                 print(f"{k+1}: {remove_repeating}")
-#
-# print([SPEECH_CLASSES[int(label)] for label in labels])
-# print(label_distances)
-#
-
