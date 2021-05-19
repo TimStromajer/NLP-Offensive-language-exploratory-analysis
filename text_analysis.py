@@ -2,7 +2,6 @@ import os
 import pickle
 from collections import defaultdict
 
-import numpy as np
 import pandas as pd
 import joblib
 import matplotlib.pyplot as plt
@@ -119,65 +118,53 @@ def k_means(matrix, k):
 
 
 def get_keywords(data):
+    filename = f"model_pickles/keywords.p"
     if not os.path.exists("model_pickles"):
         os.makedirs("model_pickles")
-    filename_vectorizer = f"model_pickles/keyword_vectorizer.p"
-    filename_tfidf = f"model_pickles/keyword_vector.p"
-    filename_stem_term_map = f"model_pickles/keyword_stem_term_map.p"
     try:
-        vect = joblib.load(filename_vectorizer)
-        tfidf = joblib.load(filename_tfidf)
-        stem_term_map = joblib.load(filename_stem_term_map)
-        print(f"Loaded keywords TfIdf vector from disk")
+        keywords = joblib.load(filename)
+        print(f"Loaded keywords from disk")
     except FileNotFoundError:
-        stem_term_map = dict()
-        tokenizer_function = lambda t: tokenize_and_stem_map_terms(t, stem_term_map)
+        print("Calculating keywords...")
+        docs = defaultdict(list)
+        for table in data:
+            table_data = pd.read_csv("data/" + table)
+            for row in table_data.iterrows():
+                id = row[1]["class"]
+                text = row[1]["text"]
+                text = remove_links(text)
+                text = remove_ats(text)
+                text = remove_retweets(text)
+                text = remove_consecutive_phrases(text.split())
+                text = " ".join(text)
+                docs[id].append(text)
+
         stop_words = tokenize_and_stem_stopwords(set(stopwords.words("english")))
-        vect = TfidfVectorizer(
-            stop_words=stop_words,
-            max_df=0.9,
-            min_df=0.1,
-            use_idf=True,
-            tokenizer=tokenizer_function,
-        )
-        print(f"Calculating keywords...")
-        tfidf = vect.fit_transform(data)
-        # remove function to prevent crash, can't pickle lambdas
-        vect.tokenizer = None
-        joblib.dump(vect, filename_vectorizer)
-        joblib.dump(tfidf, filename_tfidf)
-        joblib.dump(stem_term_map, filename_stem_term_map)
+        keywords = []
+        for speech_class in docs.keys():
+            vect = TfidfVectorizer(
+                stop_words=stop_words,
+                max_df=0.85,
+                tokenizer=tokenize_and_stem,
+            )
+            tfidf = vect.fit_transform(docs[speech_class])
+            mean = tfidf.mean(0)  # mean of each column - average tfidf of each term from the vocabulary
+            words = vect.get_feature_names()
+
+            word_frequencies = []
+            for i in range(mean.shape[1]):
+                word_frequencies.append((words[i], mean[0, i]))
+            keywords.append(list(sorted(word_frequencies, key=lambda item: item[1], reverse=True)))
+        joblib.dump(keywords, filename)
     finally:
-        terms = vect.get_feature_names()
-        dense = tfidf.todense()
-        denselist = dense.tolist()
-
-        all_keywords = []
-        for description in denselist:
-            x = 0
-            keywords = []
-            for frequency in description:
-                if frequency > 0:
-                    keywords.append((terms[x], frequency))
-                x += 1
-            keywords = list(sorted(keywords, key=lambda item: item[1], reverse=True))
-            all_keywords.append(keywords)
-
-        all_full_terms = list()
-        for keywords in all_keywords:
-            label_full_terms = list()
-            for keyword in keywords:
-                full_term = stem_term_map[keyword[0]]
-                label_full_terms.append(full_term)
-            all_full_terms.append(label_full_terms)
-
-        return all_full_terms
+        return keywords
 
 
 def main():
     k = 6
     tables = [f"{i}.csv" for i in [9, 21, 25, 26, 31, 32, 'jigsaw-toxic']]
     documents, classes = combine_texts(tables)
+    keywords = get_keywords(tables)
     tfidf, terms, stem_term_map = tf_idf(documents)
 
     km = k_means(tfidf, k)
