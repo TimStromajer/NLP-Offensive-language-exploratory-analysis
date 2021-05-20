@@ -48,10 +48,14 @@ if __name__ == '__main__':
 
     fixed_labels = list(label_keywords.keys())
     # Manual ordering for a clearer visualization of similarities
-    manually_ordered = ['sexist', 'appearance-related', 'offensive', 'homophobic',
-                        'racist', 'abusive', 'intellectual', 'threat', 'severe_toxic', 'identity_hate',
-                        'hateful', 'political', 'religion', 'profane', 'obscene', 'insult',
-                        'toxic',  'cyberbullying']
+    # manually_ordered = ['sexist', 'appearance-related', 'offensive', 'homophobic',
+    #                     'racist', 'abusive', 'intellectual', 'threat', 'severe_toxic', 'identity_hate',
+    #                     'hateful', 'political', 'religion', 'profane', 'obscene', 'insult',
+    #                     'toxic',  'cyberbullying']
+    manually_ordered = ['religion', 'hateful', 'sexist', 'offensive', 'appearance-related', 'homophobic',
+                        'racist', 'abusive', 'political', 'profane', 'identity_hate', 'intellectual', 'threat',
+                        'severe_toxic', 'obscene', 'insult', 'toxic',  'cyberbullying']
+
     fixed_labels = [label for label in manually_ordered if label in fixed_labels]
 
     # Get only the keyword form that appears the most often
@@ -69,6 +73,8 @@ if __name__ == '__main__':
     models = {
         'Word2vec': lambda: gensim.downloader.load('word2vec-google-news-300'),
         'Glove': lambda: gensim.downloader.load('glove-wiki-gigaword-300'),
+        'Glove50': lambda: gensim.downloader.load('glove-wiki-gigaword-50'),
+        'GloveTwitter50': lambda: gensim.downloader.load('glove-twitter-50'),
         'FastText': lambda: load_fasttext()
     }
 

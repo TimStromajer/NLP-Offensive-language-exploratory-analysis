@@ -10,7 +10,7 @@ from scipy.spatial import distance
 from nltk.corpus import stopwords
 from sentence_transformers.util import pytorch_cos_sim
 
-from text_processing import tokenize, remove_links, remove_ats, remove_consecutive_phrases
+from text_processing import tokenize, remove_links, remove_ats, remove_consecutive_phrases, remove_retweets
 from speech_classes import SPEECH_CLASSES
 from dense_plotting import plotPCA, plotMDS, plotTSNE, plotDistanceMatrix
 
@@ -43,6 +43,7 @@ def embed_documents(model, posts):
         print(100*i/len(posts))
         post = remove_links(post)
         post = remove_ats(post)
+        posts = remove_retweets(post)
         tokens = tokenize(post)
         tokens = remove_consecutive_phrases(tokens)
         embedded_post = embed_document(model, tokens)
@@ -87,7 +88,7 @@ if not os.path.exists(intermediate_location):
 if __name__ == '__main__':
     regenerate = False
     def load_w2v():
-        print("Loading word2vec...")
+        print("Loading model...")
         w2v_model = gensim.downloader.load('word2vec-google-news-300')
         print("Loaded.")
         return w2v_model
@@ -109,6 +110,9 @@ if __name__ == '__main__':
     for file_name in input_files:
         data_path = 'data'
         file_path = os.path.join(data_path, file_name)
+        if not os.path.exists(file_path):
+            print(f"Skipping {file_path}, because source is not available")
+            continue
         data = read_document(file_path)
         data = data[data['class'] != '0']
         posts = list(data['text'])
@@ -171,20 +175,23 @@ if __name__ == '__main__':
         embedding_top_similar.append(label_embedding_top)
         posts_top_similar.append(label_post_top)
 
+
+
     # Similarity of the combined embeddings of each label
-    similarity = pytorch_cos_sim(embedding_totals, embedding_totals)
-    similarity = similarity.numpy()
-
-    plotMDS("MDS Totals", labels, [[tot] for tot in embedding_totals])
-    plotPCA("PCA Totals", labels, [[tot] for tot in embedding_totals])
-    # plotMDS("Title", embedding_top_similar)
-    # plotTSNE("Title", embedding_top_similar, perplexity=10)
-    # plotPCA("Title", embedding_top_similar)
-
-    plotDistanceMatrix("Document Similarity", labels, similarity)
+    # similarity = pytorch_cos_sim(embedding_totals, embedding_totals)
+    # similarity = similarity.numpy()
+    #
+    # plotMDS("MDS Totals", labels, [[tot] for tot in embedding_totals])
+    # plotPCA("PCA Totals", labels, [[tot] for tot in embedding_totals])
+    # plotDistanceMatrix("Document Similarity", labels, similarity)
 
     # Distance based representative
     # Finds the posts closest based on the lowest distance to all posts withn the class
+
+    print()
+    print()
+    print()
+    print("DISTANCE BASED")
     for i, (label, embeddings) in enumerate(labels_embeddings.items()):
         label_distance, _, indexs, _ = document_group_similarities(embeddings, embeddings)
         print("==============")
@@ -192,7 +199,8 @@ if __name__ == '__main__':
         print(label_distance)
         for j in range(top_count_print):
             no_links = remove_links(label_posts[label][indexs[j].item()])
-            no_ats = remove_ats(no_links)
-            remove_repeating = remove_consecutive_phrases(no_ats.split())
+            # no_ats = remove_ats(no_links)
+            # no_rts = remove_retweets(no_ats)
+            remove_repeating = remove_consecutive_phrases(no_links.split())
             remove_repeating = " ".join(remove_repeating)
             print(f"{j+1}: {remove_repeating}")
