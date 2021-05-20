@@ -118,63 +118,58 @@ def k_means(matrix, k):
 
 
 def get_keywords(data):
-    filename = f"model_pickles/keywords.p"
     if not os.path.exists("model_pickles"):
         os.makedirs("model_pickles")
+    filename_vectorizer = f"model_pickles/keyword_vectorizer.p"
+    filename_tfidf = f"model_pickles/keyword_vector.p"
+    filename_stem_term_map = f"model_pickles/keyword_stem_term_map.p"
     try:
-        all_full_terms = joblib.load(filename)
-        print(f"Loaded keywords from disk")
+        vect = joblib.load(filename_vectorizer)
+        tfidf = joblib.load(filename_tfidf)
+        stem_term_map = joblib.load(filename_stem_term_map)
+        print(f"Loaded keywords TfIdf vector from disk")
     except FileNotFoundError:
-        print("Calculating keywords...")
-        docs_by_class = defaultdict(list)
-        for table in data:
-            table_data = pd.read_csv("data/" + table)
-            for row in table_data.iterrows():
-                id = row[1]["class"]
-                text = row[1]["text"]
-                text = remove_links(text)
-                text = remove_ats(text)
-                text = remove_retweets(text)
-                text = remove_consecutive_phrases(text.split())
-                text = " ".join(text)
-                docs_by_class[id].append(text)
-
-        docs_joined = []
-        class_sizes = []
-        for class_name, value in sorted(docs_by_class.items(), key=lambda x: x[0]):
-            docs_joined += value
-            class_sizes.append(len(value))
-
-        stop_words = tokenize_and_stem_stopwords(set(stopwords.words("english")))
-        keywords = []
         stem_term_map = dict()
+        tokenizer_function = lambda t: tokenize_and_stem_map_terms(t, stem_term_map)
+        stop_words = tokenize_and_stem_stopwords(set(stopwords.words("english")))
         vect = TfidfVectorizer(
             stop_words=stop_words,
-            max_df=0.85,
-            tokenizer=lambda x: tokenize_and_stem_map_terms(x, stem_term_map),
+            max_df=0.9,
+            min_df=0.1,
+            use_idf=True,
+            tokenizer=tokenizer_function,
         )
-        tfidf = vect.fit_transform(docs_joined)
-        mean = tfidf.mean(0)  # mean of each column - average tfidf of each term from the vocabulary
-        words = vect.get_feature_names()
+        print(f"Calculating keywords...")
+        tfidf = vect.fit_transform(data)
+        # remove function to prevent crash, can't pickle lambdas
+        vect.tokenizer = None
+        joblib.dump(vect, filename_vectorizer)
+        joblib.dump(tfidf, filename_tfidf)
+        joblib.dump(stem_term_map, filename_stem_term_map)
+    finally:
+        terms = vect.get_feature_names()
+        dense = tfidf.todense()
+        denselist = dense.tolist()
 
-        word_frequencies = []
-        for i in range(mean.shape[1]):
-            word_frequencies.append((words[i], mean[0, i]))
-
-        index = 0
-        for size in class_sizes:
-            keywords.append(list(sorted(word_frequencies[index:index + size], key=lambda item: item[1], reverse=True)))
+        all_keywords = []
+        for description in denselist:
+            x = 0
+            keywords = []
+            for frequency in description:
+                if frequency > 0:
+                    keywords.append((terms[x], frequency))
+                x += 1
+            keywords = list(sorted(keywords, key=lambda item: item[1], reverse=True))
+            all_keywords.append(keywords)
 
         all_full_terms = list()
-        for l_keywords in keywords:
+        for keywords in all_keywords:
             label_full_terms = list()
-            for keyword in l_keywords:
+            for keyword in keywords:
                 full_term = stem_term_map[keyword[0]]
                 label_full_terms.append(full_term)
             all_full_terms.append(label_full_terms)
 
-        joblib.dump(all_full_terms, filename)
-    finally:
         return all_full_terms
 
 
@@ -182,8 +177,8 @@ def main():
     k = 6
     tables = [f"{i}.csv" for i in [9, 21, 25, 26, 31, 32, 'jigsaw-toxic']]
     documents, classes = combine_texts(tables)
-    keywords = get_keywords(tables)
-    print([k[:3] for k in keywords])
+    keywords = get_keywords(documents)
+    # print([k[:3] for k in keywords])
     tfidf, terms, stem_term_map = tf_idf(documents)
 
     km = k_means(tfidf, k)

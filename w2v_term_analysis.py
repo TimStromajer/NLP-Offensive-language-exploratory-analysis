@@ -31,10 +31,13 @@ def create_embedding_clusters(model, label_keywords):
     model_gn = model()
     print("Loaded")
     embedding_clusters = dict()
+    top_keywords = dict()
     for label, keywords in label_keywords.items():
-        embeddings = [model_gn[word] for word in (keywords) if word in model_gn]
+        embeddings = [model_gn[word] for word in keywords if word in model_gn]
         embedding_clusters[label] = embeddings
-    return embedding_clusters
+        label_words = [word for word in keywords if word in model_gn]
+        top_keywords[label] = label_words
+    return embedding_clusters, top_keywords
 
 
 if __name__ == '__main__':
@@ -72,15 +75,20 @@ if __name__ == '__main__':
     for model_name, model in models.items():
         print(model_name)
 
-        embedding_clusters = load_or_create(os.path.join(keywords_dir, f"{model_name} keyword embeddings.p"),
+        embedding_clusters, top_keywords = load_or_create(os.path.join(keywords_dir, f"{model_name} keyword embeddings.p"),
                                             lambda: create_embedding_clusters(model, label_keywords))
         # Convert to list of lists
         embedding_clusters = [embedding_clusters[label] for label in fixed_labels]
-
+        top_keywords = [top_keywords[label] for label in fixed_labels]
         # Only include the number of keywords from the smallest class
-        min_len = len(min(embedding_clusters, key=len))
+        # min_len = len(min(embedding_clusters, key=len))
+        min_len = 50
         print(min_len)
         embedding_clusters = [cluster[:min_len] for cluster in embedding_clusters]
+
+        for i, keywords in enumerate(top_keywords):
+            print(fixed_labels[i])
+            print(keywords[:min_len])
 
         # Calculate the combined embedding for each class
         embedding_totals = [sum(embeddings)/len(embeddings) for embeddings in embedding_clusters]
@@ -93,8 +101,8 @@ if __name__ == '__main__':
                 filename=os.path.join(keywords_dir, f"{model_name} PCA"))
         plotMDS(f"MDS Top Terms {model_name} embedding", fixed_labels, embedding_totals,
                 filename=os.path.join(keywords_dir, f"{model_name} MDS"))
-        plotTSNE(f"TSNE Top Terms {model_name} embedding", fixed_labels, embedding_totals,
-                 filename=os.path.join(keywords_dir, f"{model_name} TSNE"))
+        #plotTSNE(f"TSNE Top Terms {model_name} embedding", fixed_labels, embedding_totals,
+        #         filename=os.path.join(keywords_dir, f"{model_name} TSNE"))
 
         plotDistanceMatrix(f"Top Terms Similarity {model_name} embedding", fixed_labels, similarity,
                            filename=os.path.join(keywords_dir, f"{model_name} similarity"))
