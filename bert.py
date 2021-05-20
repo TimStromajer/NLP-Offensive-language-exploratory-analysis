@@ -212,7 +212,7 @@ def cosine_dist(vec1, vec2):
     return 1 - cosine(vec1, vec2)
 
 
-def visualize_dendrogram():
+def visualize_dendrogram(mean):
     dists = []
     labels = []
     for i, m1 in enumerate(mean):
@@ -229,29 +229,23 @@ def visualize_dendrogram():
     dn = dendrogram(Z, labels=labels, leaf_rotation=25)
     plt.show()
 
+
+def calculate_bert_vectors(tables, chosen_class, added_sent=False, only_class_word=False):
+    model, tokenizer = load_model_and_tokenizer()
+    texts = get_texts(tables, chosen_class, added_sent=added_sent)
+    class_mean, sentence = get_class_mean_and_sentence(model, tokenizer, texts, chosen_class, only_class_word=only_class_word)
+    print(sentence)
+    print(class_mean)
+
 if __name__ == '__main__':
-    # mean and sentences saved in bert_vectors.py
-    # tables = ["21.csv", "9.csv"]
-    # chosen_class = 20
-    # model, tokenizer = load_model_and_tokenizer()
-    # texts = get_texts(tables, chosen_class)
-    # class_mean, sentence = get_mean_and_sentence(model, tokenizer, texts)
-    # print(sentence)
-    # print(class_mean)
-
-    visualize_dendrogram()
-
-    # for c, s in zip(SPEECH_CLASSES, sent):
-    #     print(c, s)
 
     # mean and sentences saved in bert_vectors.py
     # tables = ["jigsaw-toxic.csv"]
-    # chosen_class = 11
-    # model, tokenizer = load_model_and_tokenizer()
-    # texts = get_texts(tables, chosen_class, added_sent=False)
-    # class_mean, sentence = get_class_mean_and_sentence(model, tokenizer, texts, chosen_class, only_class_word=False)
-    # print(sentence)
-    # print(class_mean)
+    # choose_class = 11
+    # calculate_bert_vectors(tables, choose_class)
+
+    visualize_dendrogram(mean)
+
 
 
 

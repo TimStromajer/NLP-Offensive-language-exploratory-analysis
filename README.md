@@ -24,3 +24,7 @@ Included classes are: offensive, profane and hateful.
 From the file *hatespeech_labels.csv* we extracted tweet ids with abusive label and then obtained all tweets with Tweeter API.
 Included classes: abusive.
 	> Not publicly available. To get the data, please contact us.
+	
+### Results
+#### Bert
+You can obtain BERT results by running script [*bert.py*](https://github.com/TimStromajer/NLP-Offensive-language-exploratory-analysis/blob/main/bert.py) (function called *visualize_dendrogram*). Due to long calculations, BERT vectors are already calculated and stored in [bert_vectors.py](https://github.com/TimStromajer/NLP-Offensive-language-exploratory-analysis/blob/main/bert_vectors.py). But if you would like to calculate it yourself, you can call the function *calculate_bert_vectors*. This will again calculate BERT vectors, which can be then used in function *visualize_dendrogram*. 
