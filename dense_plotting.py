@@ -26,7 +26,7 @@ def plot_dense_embeddings(title, labels, embedding_clusters, filename=None):
         annotated.set_path_effects([path_effects.Stroke(linewidth=1.5, foreground='white'),
                                     path_effects.Normal()])
     # plt.legend(loc=4)
-    plt.title(title)
+    # plt.title(title)
     plt.grid(False)
     if filename:
         plt.savefig(f"{filename}.png", format='png', dpi=150, bbox_inches='tight')
@@ -65,7 +65,7 @@ def plotPCA(title, labels, embedding_clusters, filename=None):
 
 def plotDistanceMatrix(title, labels, similarity_matrix, filename=None):
     plt.figure(figsize=(8, 7))
-    plt.title(title)
+    # plt.title(title)
     labels_formatted = [format_label(label) for label in labels]
     plt.pcolor(similarity_matrix, cmap='plasma')
     plt.xticks([x + 0.5 for x in range(len(labels))], labels_formatted, rotation=90)
