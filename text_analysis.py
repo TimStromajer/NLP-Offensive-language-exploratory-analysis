@@ -1,25 +1,24 @@
 import os
 import pickle
-from collections import defaultdict
 
-import pandas as pd
 import joblib
-import matplotlib.pyplot as plt
-import matplotlib.patheffects as path_effects
-from sklearn.feature_extraction.text import TfidfVectorizer, CountVectorizer
-from sklearn.cluster import KMeans
-from sklearn.decomposition import PCA
-from sklearn.manifold import MDS
+import pandas as pd
 from nltk.corpus import stopwords
+from sklearn.cluster import KMeans
+from sklearn.feature_extraction.text import TfidfVectorizer
 
-from text_processing import tokenize_and_stem, vocabulary_frame, tokenize_and_stem_map_terms, remove_ats, remove_links, \
-    remove_consecutive_phrases, tokenize_and_stem_stopwords, remove_retweets, to_ascii
 from speech_classes import SPEECH_CLASSES
-from dense_plotting import format_label
+from text_processing import tokenize_and_stem_map_terms, tokenize_and_stem_stopwords, remove_links, remove_ats, \
+    remove_retweets, remove_consecutive_phrases
 
 
-# todo: vrne you\'re v ofsCls namesto you're
 def combine_texts(tabs):
+    """
+    Returns 2 values. The first is a list of strings, each string representing
+    a document of all the data in each speech class. The second is a list of speech class
+    id's, in the same order as their respective documents from the first list.
+    """
+
     num_classes = len(SPEECH_CLASSES)
 
     def read_table(table):
@@ -69,6 +68,12 @@ def combine_texts(tabs):
 
 
 def tf_idf(texts):
+    """
+    Returns 3 values. The first is the tfidf vectorizer, the second is
+    the vectorizer's vocabulary and the third is a dictionary which maps
+    stemmed terms to unstemmed terms.
+    """
+
     if not os.path.exists("model_pickles"):
         os.makedirs("model_pickles")
     filename_vectorizer = f"model_pickles/tfidf_vectorizer.p"
@@ -85,8 +90,8 @@ def tf_idf(texts):
         stop_words = tokenize_and_stem_stopwords(set(stopwords.words("english")))
         vect = TfidfVectorizer(
             stop_words=stop_words,
-            max_df=0.5,
-            min_df=5,
+            max_df=0.8,
+            min_df=0.1,
             use_idf=True,
             tokenizer=tokenizer_function,
             ngram_range=(1, 3)
@@ -174,64 +179,3 @@ def get_keywords(data):
             all_full_terms.append(label_full_terms)
 
         return all_full_terms
-
-
-def main():
-    k = 6
-    tables = [f"{i}.csv" for i in [9, 21, 25, 26, 31, 32, 'jigsaw-toxic']]
-    documents, classes = combine_texts(tables)
-    # keywords = get_keywords(documents)
-    # print([k[:3] for k in keywords])
-    tfidf, terms, stem_term_map = tf_idf(documents)
-
-    km = k_means(tfidf, k)
-    kmean_indices = km.fit_predict(tfidf)
-    order_centroids = km.cluster_centers_.argsort()[:, ::-1]
-
-    # Creates dict mapping cluster to text classes
-    # kmean_indices: index = text class; value = cluster
-    cluster_classes = dict()
-    for text_class, cluster in enumerate(kmean_indices):
-        if cluster not in cluster_classes:
-            cluster_classes[cluster] = list()
-        cluster_classes[cluster].append(SPEECH_CLASSES[classes[text_class]])
-
-    with open("clusters.txt", "w") as f:
-        for i in range(k):
-            f.write(f"Cluster {i}: {', '.join(cluster_classes[i])}\n")
-            cluster_terms = list()
-            for ind in order_centroids[i, :20]:
-                output_term = [stem_term_map[term] for term in terms[ind].split()]
-                output_term = [max(term, key=term.get) for term in output_term]
-                cluster_terms.extend(output_term)
-            f.write(f"\t{cluster_terms}\n")
-            f.write("\n\n")
-
-    # pca = PCA(n_components=2)
-    # scatter_plot_points = pca.fit_transform(tfidf.toarray())
-
-    mds = MDS(n_components=2)
-    scatter_plot_points = mds.fit_transform(tfidf.toarray())
-    colors = ["r", "g", "b", "c", "y", "m"]
-
-    x_axis = []
-    y_axis = []
-    for x, y in scatter_plot_points:
-        x_axis.append(x)
-        y_axis.append(y)
-
-    plt.figure(figsize=(8, 7))
-    plt.scatter(x_axis, y_axis, c=[colors[d] for d in kmean_indices], alpha=0.6, s=300)
-    for i in range(len(classes)):
-        label = format_label(SPEECH_CLASSES[classes[i]])
-        annotated = plt.annotate(label, (x_axis[i], y_axis[i]), textcoords='offset points',
-                                 ha='center', va='center', size=10)
-        annotated.set_path_effects([path_effects.Stroke(linewidth=1.5, foreground='white'),
-                                    path_effects.Normal()])
-    plt.show()
-
-    print("")
-
-
-if __name__ == '__main__':
-    main()

@@ -1,24 +1,24 @@
-Cluster 0: profane, hateful
-	['world', 'cup', 'cricket', 'impeachtrump', 'boris', 'gloves', 'impeachment', 'dhoni', 'maga', 'bengal', 'congress', 'oral', 'coon', 'tory', 'brexit', 'tournament', 'democracy', 'notmypresident', 'nig', 'trump2020', 'happy', 'birthday']
+Cluster 0: religion
+	['banislam', 'bansharia', 'islam', 'terrorism', 'stopislam', 'religion', 'muzzie', 'surrender', 'terrorism islam', 'islamist']
 
 
 Cluster 1: obscene, threat, insult, toxic, severe_toxic, identity_hate
-	['wikipedia', 'vandalism', 'revert', 'talk', 'page', 'wiki', 'ip', 'editors', 'homosexual', 'this', 'article', 'person', 'attack', 'this', 'page', 'wp', 'unblock', 'eat', 'shit', 'utc', 'fuck', 'wikipedia', 'suck', 'cock', 'billcj', 'encyclopedia', 'this', 'site']
+	['wikipedia', 'page', 'edit', 'article', 'vandalism', 'user', 'revert', 'motherfucker', 'fag', 'talk page']
 
 
-Cluster 2: offensive, abusive, appearance-related
-	['bad', 'bitch', 'niggah', 'assface', 'fatass', 'eat', 'gym', 'bitch', "'m", 'dickface', 'fugly', 'bitch', 'bitch', 'bad', 'ass', 'yo', 'bitch', 'dm', 'wrestlemania', 'nasty', 'ass', 'bird', 'rn', 'gt', 'gt', 'this', 'idiot', 'lt', 'lt', 'grandpa']
+Cluster 2: homophobic, sexist, appearance-related
+	['dyke', 'fatass', 'camel toe', 'milf', 'skank', 'gt', 'gt gt', 'camel', 'toe', 'full gallery']
 
 
-Cluster 3: cyberbullying
-	['riot', 'op', 'forum', 'this', 'game', 'ip', 'hacker', 'gd', 'sexual', 'harassment', 'got', 'ban', 'it.', 'pretty', 'much', 'boost', 'teammates', 'increase', 'white', 'knight', 'silver', 'stacks', 'this', 'individual', 'me.', "'ve", 'play']
+Cluster 3: offensive, abusive, cyberbullying, racist
+	['hoes', 'this nigga', 'amp', 'riot', 'white trash', 'op', 'bad bitch', "y'all", 'runes', 'lil']
 
 
-Cluster 4: racist, homophobic, sexist, religion
-	['call', 'faggot', 'gt', 'gt', 'surrender', 'muzzie', 'nigga', 'nigga', 'faggot', 'faggot', 'hillbilly', 'gallery', 'say', 'faggot', 'islamist', 'call', 'nigger', 'nigga', 'this', 'gt', 'gt', 'gt', 'maga', 'like', 'dyke', 'nigger', 'nigga', 'happy', 'birthday', 'feminazi', 'sjw', 'victim', 'card']
+Cluster 4: profane, hateful
+	['fucktrump', 'trumpisatraitor', 'shameonicc', 'borisjohnsonshouldnotbepm', 'doctorsfightback', 'icc', 'dhonikeepstheglove', 'amp', 'dickhead', 'douchebag']
 
 
 Cluster 5: intellectual, political
-	['fuckbag', 'dickwad', 'tard', 'asswipe', 'u', 'dumb', 'fuck', 'u', 'dumb', 'cockhead', 'fuck', 'dumb', 'fuck', 'ass-hat', 'fuck', 'dumb', 'dickface', 'dumb', 'fuck', 'this', 'fuck', 'tard', 'clinton', 'get', 'head', 'dumb', 'fuck', 'fuck', 'one', 'dumb', 'notmypresident', 'ruski', 'trump', 'support']
+	['twatwaffle', 'dumb fuck', 'fucktard', 'fuckbag', 'asshat', 'shithead', 'amp', 'dickwad', 'assbag', 'fuckhead']
 
 
