@@ -9,6 +9,7 @@ import numpy as np
 
 from bert_vectors import mean, sent, mean2, mean3
 from speech_classes import SPEECH_CLASSES
+from dense_plotting import format_label
 
 
 def bert_to_vec(text, model, tokenizer, class_word=None):
@@ -226,7 +227,8 @@ def visualize_dendrogram(mean_):
 
     Z = linkage(dists, 'average')
     fig = plt.figure(figsize=(15, 8))
-    dn = dendrogram(Z, labels=labels, leaf_rotation=25)
+    labels_formatted = [format_label(label) for label in labels]
+    dn = dendrogram(Z, labels=labels_formatted, leaf_rotation=25)
     plt.show()
 
 
@@ -236,15 +238,19 @@ def calculate_bert_vectors(tables, chosen_class, added_sent=False, only_class_wo
     class_mean, sentence = get_class_mean_and_sentence(model, tokenizer, texts, chosen_class, only_class_word=only_class_word)
     print(sentence)
     print(class_mean)
+    return class_mean
 
 if __name__ == '__main__':
 
     # mean and sentences saved in bert_vectors.py
-    # tables = ["jigsaw-toxic.csv"]
-    # choose_class = 24
-    # calculate_bert_vectors(tables, choose_class, added_sent=True, only_class_word=True)
+    # tables = ['9.csv', '21.csv', '25.csv', '26.csv', '31.csv', '32.csv', 'jigsaw-toxic.csv']
+    # choosen_class = [1, 2, 3, 5, 6, 7, 10, 11, 13, 14, 16, 17, 18, 19, 20, 22, 23, 24]
+    # calc_mean = [[0] for _ in range(25)]
+    # for c in choosen_class:
+    #     calc_mean = calculate_bert_vectors(tables, c, added_sent=True, only_class_word=True)
+    #     calc_mean[c] = calc_mean
 
-    visualize_dendrogram(mean3)
+    visualize_dendrogram(mean)
 
 
 
