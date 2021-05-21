@@ -51,4 +51,5 @@ You can obtain BERT results by running script [*bert.py*](https://github.com/Tim
 #### K-means
 You can obtain the k-means results by running the script [*kmeans.py*](https://github.com/TimStromajer/NLP-Offensive-language-exploratory-analysis/blob/main/kmeans.py). Upon first run, all models and documents are saved to improve performance of subsequent runs. If you wish to rerun it with different parameters, delete the folders ```data_pickles``` and ```model_pickles```. The graph is saved in the file ```kmeans.png```.
 
+### Offensive language schema
 ![Offensive language schema](schema/Schema.png)
