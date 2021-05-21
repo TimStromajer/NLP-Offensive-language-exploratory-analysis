@@ -55,7 +55,7 @@ def main():
                                  ha='center', va='center', size=10)
         annotated.set_path_effects([path_effects.Stroke(linewidth=1.5, foreground='white'),
                                     path_effects.Normal()])
-    plt.savefig("kmeans.png", dpi=96)
+    plt.savefig("kmeans.png", dpi=300)
     plt.show()
 
 

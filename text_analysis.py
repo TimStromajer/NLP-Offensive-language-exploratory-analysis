@@ -54,6 +54,9 @@ def combine_texts(tabs):
     non_empty_classes = list(range(len(SPEECH_CLASSES)))
     non_empty_documents = []
     for t in tabs:
+        if not os.path.exists("data/" + t):
+            print(f"Skipping {t}, because source is not available")
+            continue
         speech_classes_t = read_table(t)
         for i in range(len(speech_class_documents)):
             speech_class_documents[i] += speech_classes_t[i]
