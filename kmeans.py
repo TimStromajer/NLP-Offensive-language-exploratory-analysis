@@ -9,7 +9,7 @@ from text_analysis import combine_texts, tf_idf, k_means
 
 def main():
     k = 6
-    tables = [f"{i}.csv" for i in [1, 9, 21, 25, 26, 31, 32, 'jigsaw-toxic']]
+    tables = [f"{i}.csv" for i in [9, 21, 25, 26, 31, 32, 'jigsaw-toxic']]
     documents, classes = combine_texts(tables)
     tfidf, terms, stem_term_map = tf_idf(documents)
 
