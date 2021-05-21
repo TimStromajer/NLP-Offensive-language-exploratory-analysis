@@ -50,3 +50,5 @@ The results are obtained by running the script [*w2v_document_embeddings.py*](ht
 You can obtain BERT results by running script [*bert.py*](https://github.com/TimStromajer/NLP-Offensive-language-exploratory-analysis/blob/main/bert.py) (function called *visualize_dendrogram*). Due to long calculations, BERT vectors are already calculated and stored in [bert_vectors.py](https://github.com/TimStromajer/NLP-Offensive-language-exploratory-analysis/blob/main/bert_vectors.py). But if you would like to calculate it yourself, you can call the function *calculate_bert_vectors*. This will again calculate BERT vectors, which can be then used in function *visualize_dendrogram*. 
 #### K-means
 You can obtain the k-means results by running the script [*kmeans.py*](https://github.com/TimStromajer/NLP-Offensive-language-exploratory-analysis/blob/main/kmeans.py). Upon first run, all models and documents are saved to improve performance of subsequent runs. If you wish to rerun it with different parameters, delete the folders ```data_pickles``` and ```model_pickles```. The graph is saved in the file ```kmeans.png```.
+
+![Offensive language schema](schema/Schema.png)
