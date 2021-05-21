@@ -9,7 +9,7 @@ from text_analysis import combine_texts, tf_idf, k_means
 
 def main():
     k = 6
-    tables = [f"{i}.csv" for i in [9, 21, 25, 26, 31, 32, 'jigsaw-toxic']]
+    tables = [f"{i}.csv" for i in [1, 9, 21, 25, 26, 31, 32, 'jigsaw-toxic']]
     documents, classes = combine_texts(tables)
     tfidf, terms, stem_term_map = tf_idf(documents)
 
@@ -55,7 +55,7 @@ def main():
                                  ha='center', va='center', size=10)
         annotated.set_path_effects([path_effects.Stroke(linewidth=1.5, foreground='white'),
                                     path_effects.Normal()])
-    plt.savefig("kmeans.png", dpi=96)
+    plt.savefig("kmeans.png", dpi=300)
     plt.show()
 
 
