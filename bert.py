@@ -251,6 +251,7 @@ if __name__ == '__main__':
     #     calc_mean[c] = calc_mean
 
     visualize_dendrogram(mean)
+    visualize_dendrogram(mean3)
 
 
 

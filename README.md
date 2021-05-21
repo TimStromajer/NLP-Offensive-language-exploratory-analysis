@@ -1,5 +1,8 @@
 # NLP-Offensive-language-exploratory-analysis
 
+## Installing dependencies
+Run the command ```pip install -r requirements.txt``` to install the dependencies.
+
 ## Reproduction of the results
 In order the obtain the same results as we have in our explanatory analysis, you must prepare the same data.
 ### Data
