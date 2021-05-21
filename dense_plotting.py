@@ -4,8 +4,14 @@ import numpy as np
 from sklearn.manifold import TSNE, MDS
 from sklearn.decomposition import PCA
 from statistics import mean
+from matplotlib import patheffects as path_effects
 from matplotlib.axes._axes import _log as matplotlib_axes_logger
 matplotlib_axes_logger.setLevel('ERROR')
+
+
+def format_label(label):
+    label = label.replace("-", " ").replace("_", " ")
+    return label.capitalize()
 
 
 def plot_dense_embeddings(title, labels, embedding_clusters, filename=None):
@@ -14,9 +20,11 @@ def plot_dense_embeddings(title, labels, embedding_clusters, filename=None):
     for label, embeddings, color in zip(labels, embedding_clusters, colors):
         x = embeddings[:, 0]
         y = embeddings[:, 1]
-        plt.scatter(x, y, c=color, alpha=0.7, label=label, s=200)
-        plt.annotate(label.upper(), alpha=1.0, xy=(mean(x), mean(y)), xytext=(0, 0),
-                     textcoords='offset points', ha='center', va='center', size=10)
+        plt.scatter(x, y, c=color, alpha=0.7, label=label, s=300)
+        annotated = plt.annotate(format_label(label), alpha=1.0, xy=(mean(x), mean(y)), xytext=(0, 0),
+                                 textcoords='offset points', ha='center', va='center', size=10)
+        annotated.set_path_effects([path_effects.Stroke(linewidth=1.5, foreground='white'),
+                                    path_effects.Normal()])
     # plt.legend(loc=4)
     plt.title(title)
     plt.grid(False)
@@ -58,9 +66,10 @@ def plotPCA(title, labels, embedding_clusters, filename=None):
 def plotDistanceMatrix(title, labels, similarity_matrix, filename=None):
     plt.figure(figsize=(8, 7))
     plt.title(title)
+    labels_formatted = [format_label(label) for label in labels]
     plt.pcolor(similarity_matrix, cmap='plasma')
-    plt.xticks([x + 0.5 for x in range(len(labels))], labels, rotation=90)
-    plt.yticks([y + 0.5 for y in range(len(labels))], labels)
+    plt.xticks([x + 0.5 for x in range(len(labels))], labels_formatted, rotation=90)
+    plt.yticks([y + 0.5 for y in range(len(labels))], labels_formatted)
     plt.colorbar(label="Cosine Similarity", orientation="vertical")
     plt.tight_layout()
     if filename:

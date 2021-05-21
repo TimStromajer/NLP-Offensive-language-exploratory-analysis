@@ -5,14 +5,17 @@ from collections import defaultdict
 import pandas as pd
 import joblib
 import matplotlib.pyplot as plt
+import matplotlib.patheffects as path_effects
 from sklearn.feature_extraction.text import TfidfVectorizer, CountVectorizer
 from sklearn.cluster import KMeans
 from sklearn.decomposition import PCA
+from sklearn.manifold import MDS
 from nltk.corpus import stopwords
 
 from text_processing import tokenize_and_stem, vocabulary_frame, tokenize_and_stem_map_terms, remove_ats, remove_links, \
     remove_consecutive_phrases, tokenize_and_stem_stopwords, remove_retweets, to_ascii
 from speech_classes import SPEECH_CLASSES
+from dense_plotting import format_label
 
 
 # todo: vrne you\'re v ofsCls namesto you're
@@ -177,7 +180,7 @@ def main():
     k = 6
     tables = [f"{i}.csv" for i in [9, 21, 25, 26, 31, 32, 'jigsaw-toxic']]
     documents, classes = combine_texts(tables)
-    keywords = get_keywords(documents)
+    # keywords = get_keywords(documents)
     # print([k[:3] for k in keywords])
     tfidf, terms, stem_term_map = tf_idf(documents)
 
@@ -204,8 +207,11 @@ def main():
             f.write(f"\t{cluster_terms}\n")
             f.write("\n\n")
 
-    pca = PCA(n_components=2)
-    scatter_plot_points = pca.fit_transform(tfidf.toarray())
+    # pca = PCA(n_components=2)
+    # scatter_plot_points = pca.fit_transform(tfidf.toarray())
+
+    mds = MDS(n_components=2)
+    scatter_plot_points = mds.fit_transform(tfidf.toarray())
     colors = ["r", "g", "b", "c", "y", "m"]
 
     x_axis = []
@@ -214,11 +220,14 @@ def main():
         x_axis.append(x)
         y_axis.append(y)
 
-    fig, ax = plt.subplots()
-    ax.scatter(x_axis, y_axis, c=[colors[d] for d in kmean_indices])
+    plt.figure(figsize=(8, 7))
+    plt.scatter(x_axis, y_axis, c=[colors[d] for d in kmean_indices], alpha=0.6, s=300)
     for i in range(len(classes)):
-        ax.annotate(SPEECH_CLASSES[classes[i]], (x_axis[i], y_axis[i]))
-
+        label = format_label(SPEECH_CLASSES[classes[i]])
+        annotated = plt.annotate(label, (x_axis[i], y_axis[i]), textcoords='offset points',
+                                 ha='center', va='center', size=10)
+        annotated.set_path_effects([path_effects.Stroke(linewidth=1.5, foreground='white'),
+                                    path_effects.Normal()])
     plt.show()
 
     print("")

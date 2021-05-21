@@ -1,21 +1,21 @@
-Cluster 0: obscene, threat, insult, toxic, severe_toxic, identity_hate
+Cluster 0: profane, hateful
+	['world', 'cup', 'cricket', 'impeachtrump', 'boris', 'gloves', 'impeachment', 'dhoni', 'maga', 'bengal', 'congress', 'oral', 'coon', 'tory', 'brexit', 'tournament', 'democracy', 'notmypresident', 'nig', 'trump2020', 'happy', 'birthday']
+
+
+Cluster 1: obscene, threat, insult, toxic, severe_toxic, identity_hate
 	['wikipedia', 'vandalism', 'revert', 'talk', 'page', 'wiki', 'ip', 'editors', 'homosexual', 'this', 'article', 'person', 'attack', 'this', 'page', 'wp', 'unblock', 'eat', 'shit', 'utc', 'fuck', 'wikipedia', 'suck', 'cock', 'billcj', 'encyclopedia', 'this', 'site']
 
 
-Cluster 1: cyberbullying
-	['riot', 'op', 'forum', 'this', 'game', 'ip', 'hacker', 'gd', 'sexual', 'harassment', 'got', 'ban', 'it.', 'pretty', 'much', 'boost', 'teammates', 'increase', 'white', 'knight', 'silver', 'stacks', 'this', 'individual', 'me.', "'ve", 'play']
-
-
-Cluster 2: racist, homophobic, sexist, religion
-	['call', 'faggot', 'gt', 'gt', 'surrender', 'muzzie', 'nigga', 'nigga', 'faggot', 'faggot', 'hillbilly', 'gallery', 'say', 'faggot', 'islamist', 'call', 'nigger', 'nigga', 'this', 'gt', 'gt', 'gt', 'maga', 'like', 'dyke', 'nigger', 'nigga', 'happy', 'birthday', 'feminazi', 'sjw', 'victim', 'card']
-
-
-Cluster 3: offensive, abusive, appearance-related
+Cluster 2: offensive, abusive, appearance-related
 	['bad', 'bitch', 'niggah', 'assface', 'fatass', 'eat', 'gym', 'bitch', "'m", 'dickface', 'fugly', 'bitch', 'bitch', 'bad', 'ass', 'yo', 'bitch', 'dm', 'wrestlemania', 'nasty', 'ass', 'bird', 'rn', 'gt', 'gt', 'this', 'idiot', 'lt', 'lt', 'grandpa']
 
 
-Cluster 4: profane, hateful
-	['world', 'cup', 'cricket', 'impeachtrump', 'boris', 'gloves', 'impeachment', 'dhoni', 'maga', 'bengal', 'congress', 'oral', 'coon', 'tory', 'brexit', 'tournament', 'democracy', 'notmypresident', 'nig', 'trump2020', 'happy', 'birthday']
+Cluster 3: cyberbullying
+	['riot', 'op', 'forum', 'this', 'game', 'ip', 'hacker', 'gd', 'sexual', 'harassment', 'got', 'ban', 'it.', 'pretty', 'much', 'boost', 'teammates', 'increase', 'white', 'knight', 'silver', 'stacks', 'this', 'individual', 'me.', "'ve", 'play']
+
+
+Cluster 4: racist, homophobic, sexist, religion
+	['call', 'faggot', 'gt', 'gt', 'surrender', 'muzzie', 'nigga', 'nigga', 'faggot', 'faggot', 'hillbilly', 'gallery', 'say', 'faggot', 'islamist', 'call', 'nigger', 'nigga', 'this', 'gt', 'gt', 'gt', 'maga', 'like', 'dyke', 'nigger', 'nigga', 'happy', 'birthday', 'feminazi', 'sjw', 'victim', 'card']
 
 
 Cluster 5: intellectual, political
