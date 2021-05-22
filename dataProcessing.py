@@ -68,8 +68,8 @@ def remove_none_labels(path):
 # remove_none_labels("data/21.csv")
 
 ##### 26 - getting 900 tweets / 15 min = 3600 / hour; last: 848187434735194112
-# consumer_key= 'IQ82FYxYl0ujW6ulJROH2GGhk'
-# consumer_secret= '5PYcvLKayHKU7QQGtQOW3Rhchf0dT7km5dBMJsRb3CrgPjEKvf'
+# consumer_key= ''
+# consumer_secret= ''
 #
 # auth = tw.AppAuthHandler(consumer_key, consumer_secret)
 # api = tw.API(auth, wait_on_rate_limit=True)
