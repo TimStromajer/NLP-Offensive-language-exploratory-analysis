@@ -1,5 +1,5 @@
 # NLP-Offensive-language-exploratory-analysis
-Public [repository](https://github.com/TimStromajer/NLP-Offensive-language-exploratory-analysis-project) with the private data removed:
+Peer review [data](https://drive.google.com/file/d/1LrnJTrE89VteMflsw9WWNBUFr9VWVtLW/view?usp=sharing) - extract to project root and replace any existing files.
 ## Installing dependencies
 Run the command ```pip install -r requirements.txt``` to install the dependencies.
 
